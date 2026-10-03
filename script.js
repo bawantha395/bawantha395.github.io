@@ -85,6 +85,24 @@
   window.addEventListener('scroll', () => {if (active && !navigating) positions.set(active, window.scrollY);}, {passive:true});
   document.querySelector('.back-to-top').addEventListener('click', () => window.scrollTo({top:0, behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'}));
   renderRoute(window.location.hash);
+  const workflow = document.querySelector('.workflow-visual');
+  if (workflow) {
+    const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const toggle = workflow.querySelector('.workflow-toggle');
+    let userPaused = false;
+    const updateMotion = () => {
+      const paused = userPaused || motionPreference.matches;
+      workflow.classList.toggle('is-paused', paused);
+      toggle.disabled = motionPreference.matches;
+      toggle.setAttribute('aria-pressed', String(paused));
+      toggle.textContent = motionPreference.matches ? 'Motion off' : userPaused ? 'Play animation' : 'Pause animation';
+    };
+    toggle.addEventListener('click', () => {userPaused = !userPaused; updateMotion();});
+    motionPreference.addEventListener('change', updateMotion);
+    workflow.classList.add('has-motion-controls');
+    toggle.hidden = false;
+    updateMotion();
+  }
   document.addEventListener('keydown', event => {
     if (!menuOpen) return;
     if (event.key === 'Escape') {event.preventDefault(); closeMenu();}
