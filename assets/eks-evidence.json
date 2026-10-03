@@ -1,0 +1,104 @@
+[
+  {
+    "src": "assets/eks-evidence/01.jpg",
+    "title": "Project architecture reference",
+    "caption": "The architecture reference supplied with the project evidence.",
+    "page": 1
+  },
+  {
+    "src": "assets/eks-evidence/02.jpg",
+    "title": "GitHub Actions pipeline",
+    "caption": "A successful recorded workflow run completed in 3 minutes and 41 seconds.",
+    "page": 2
+  },
+  {
+    "src": "assets/eks-evidence/03.jpg",
+    "title": "Container images in ECR",
+    "caption": "Separate repositories hold the gateway, authentication, frontend and issue service images.",
+    "page": 3
+  },
+  {
+    "src": "assets/eks-evidence/04.jpg",
+    "title": "Terraform environment and modules",
+    "caption": "The environment configuration connects the foundation, registry, database and EKS modules.",
+    "page": 4
+  },
+  {
+    "src": "assets/eks-evidence/05.jpg",
+    "title": "Terraform state in S3",
+    "caption": "The project stores the environment state in an S3 backend.",
+    "page": 5
+  },
+  {
+    "src": "assets/eks-evidence/06.jpg",
+    "title": "Kubernetes application manifests",
+    "caption": "The issue service deployment defines its image, ports and resource settings.",
+    "page": 6
+  },
+  {
+    "src": "assets/eks-evidence/07.jpg",
+    "title": "EKS cluster and node group",
+    "caption": "The AWS console capture shows the cluster and its managed node group.",
+    "page": 7
+  },
+  {
+    "src": "assets/eks-evidence/08.jpg",
+    "title": "Namespaces, nodes and workloads",
+    "caption": "The terminal capture shows the project namespaces, worker nodes and application pods.",
+    "page": 8
+  },
+  {
+    "src": "assets/eks-evidence/09.jpg",
+    "title": "Argo CD applications",
+    "caption": "Application and monitoring resources are managed through Argo CD.",
+    "page": 9
+  },
+  {
+    "src": "assets/eks-evidence/10.jpg",
+    "title": "Argo CD resource tree",
+    "caption": "The resource tree connects application deployments, services and pods. This capture includes a deployment still progressing.",
+    "page": 10
+  },
+  {
+    "src": "assets/eks-evidence/11.jpg",
+    "title": "Argo CD network view",
+    "caption": "The network view shows the ingress and the services behind it.",
+    "page": 11
+  },
+  {
+    "src": "assets/eks-evidence/12.jpg",
+    "title": "Issue tracker application",
+    "caption": "The application sign in screen reached through the cloud deployment.",
+    "page": 12
+  },
+  {
+    "src": "assets/eks-evidence/13.jpg",
+    "title": "Grafana workload dashboard",
+    "caption": "The workload dashboard displays CPU usage, quotas and memory for the application namespace.",
+    "page": 13
+  },
+  {
+    "src": "assets/eks-evidence/14.jpg",
+    "title": "Grafana cluster dashboard",
+    "caption": "The cluster dashboard brings CPU and memory information together across namespaces.",
+    "page": 14
+  },
+  {
+    "src": "assets/eks-evidence/15.jpg",
+    "title": "Autoscaling configuration",
+    "caption": "The issue service HPA configuration sets a range of one to five replicas with CPU and memory targets.",
+    "page": 15
+  },
+  {
+    "src": "assets/eks-evidence/16.jpg",
+    "title": "Workloads during simulated load",
+    "caption": "This terminal capture records running and pending pods during the load exercise.",
+    "page": 16
+  },
+  {
+    "src": "assets/eks-evidence/17.jpg",
+    "title": "HPA response during simulated load",
+    "caption": "The HPA output records changes in utilization and replica counts during the simulated load exercise.",
+    "page": 17
+  }
+]
