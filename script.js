@@ -9,8 +9,8 @@
   const status = document.getElementById('status-message');
   const pageName = document.getElementById('page-name');
   const positions = new Map();
-  const names = {about:'About', experience:'Experience', projects:'Projects', skills:'Skills', blog:'Articles', contact:'Contact'};
-  const aliases = {top:'about', resume:'contact', homelab:'projects'};
+  const names = {about:'About', experience:'Experience', projects:'Projects', cloudlab:'Cloud Lab', skills:'Skills', certifications:'Certifications', blog:'Articles', contact:'Contact'};
+  const aliases = {top:'about', resume:'contact', homelab:'cloudlab', 'cloud-lab':'cloudlab'};
   let active = '', menuOpen = false, navigating = false, frame = 0;
   document.documentElement.classList.add('js');
   if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
@@ -33,7 +33,7 @@
     try {id = decodeURIComponent(hash.replace(/^#/, '')) || 'about';} catch {id = 'about';}
     const known = pages.find(page => page.id === id);
     if (known) return {page:known, target:null};
-    if (aliases[id]) return {page:pages.find(page => page.id === aliases[id]), target:id === 'homelab' ? document.getElementById('eks-project') : null};
+    if (aliases[id]) return {page:pages.find(page => page.id === aliases[id]), target:null};
     const target = document.getElementById(id), page = target?.closest('[data-page]');
     return {page:page || pages[0], target:page ? target : null};
   };
