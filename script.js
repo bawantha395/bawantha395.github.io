@@ -28,6 +28,25 @@
   backdrop.addEventListener('click', closeMenu);
   mobile.addEventListener('change', () => setMenu(false, false));
   setMenu(false, false);
+  const filterControllers = new Map();
+  document.querySelectorAll('[data-filter-page]').forEach(bar => {
+    const page = document.getElementById(bar.dataset.filterPage);
+    const groups = [...page.querySelectorAll('[data-filter-category]')];
+    const buttons = [...bar.querySelectorAll('[data-filter]')];
+    const apply = (choice, announce = false) => {
+      const category = buttons.some(button => button.dataset.filter === choice) ? choice : 'all';
+      buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.filter === category)));
+      groups.forEach(group => {group.hidden = category !== 'all' && group.dataset.filterCategory !== category;});
+      if (announce) {
+        const selector = page.id === 'projects' ? '.project' : '.article-row';
+        const count = groups.filter(group => !group.hidden).reduce((total, group) => total + group.querySelectorAll(selector).length, 0);
+        status.textContent = count + (page.id === 'projects' ? ' projects' : ' articles') + ' shown.';
+      }
+    };
+    buttons.forEach(button => button.addEventListener('click', () => apply(button.dataset.filter, true)));
+    filterControllers.set(page.id, {apply});
+    apply('all');
+  });
   const targetFor = hash => {
     let id;
     try {id = decodeURIComponent(hash.replace(/^#/, '')) || 'about';} catch {id = 'about';}
@@ -52,6 +71,8 @@
       else link.removeAttribute('aria-current');
     });
     if (target?.classList.contains('project')) target.querySelector('.project-expand').open = true;
+    const group = target?.closest('[data-filter-category]');
+    if (group?.hidden) filterControllers.get(page.id)?.apply(group.dataset.filterCategory);
     setMenu(false, false);
     if (focus) page.focus({preventScroll:true});
     frame = window.requestAnimationFrame(() => {
@@ -69,6 +90,13 @@
     const link = event.target.closest('a[href^="#"]');
     if (!link || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     const hash = link.getAttribute('href');
+    if (link.classList.contains('brand') || link.classList.contains('mobile-brand')) {
+      event.preventDefault();
+      window.history.replaceState(null, '', '#about');
+      window.scrollTo({top:0, behavior:'instant'});
+      window.location.reload();
+      return;
+    }
     if (hash === '#main') {
       event.preventDefault();
       document.getElementById('main').focus({preventScroll:true});
@@ -104,17 +132,30 @@
   });
 
   const copyButton = document.querySelector('.copy-email');
-  const copyLabel = copyButton.querySelector('span');
+  const copyIcon = copyButton.querySelector('use');
   let copyTimeout;
+  const resetCopy = () => {
+    copyIcon.setAttribute('href', '#icon-copy');
+    copyButton.setAttribute('aria-label', 'Copy email address');
+    copyButton.setAttribute('title', 'Copy email address');
+    copyButton.classList.remove('copied');
+  };
   copyButton.addEventListener('click',async () => {
     try{
       await navigator.clipboard.writeText('rathnayakermbtm@gmail.com');
-      copyLabel.textContent='Email copied';status.textContent='Email address copied to your clipboard.';
-      clearTimeout(copyTimeout);copyTimeout=setTimeout(() => {copyLabel.textContent='Copy email';},3000);
+      copyIcon.setAttribute('href', '#icon-check');
+      copyButton.setAttribute('aria-label', 'Email address copied');
+      copyButton.setAttribute('title', 'Email copied');
+      copyButton.classList.add('copied');
+      status.textContent='Email address copied to your clipboard.';
+      clearTimeout(copyTimeout);copyTimeout=setTimeout(resetCopy,3000);
     }catch{
       const range=document.createRange();range.selectNodeContents(document.querySelector('.email-link'));
       const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);
-      copyLabel.textContent='Email selected';status.textContent='The email address is selected. Use your device copy command.';
+      resetCopy();
+      copyButton.setAttribute('aria-label', 'Email address selected. Use your copy command.');
+      copyButton.setAttribute('title', 'Email selected');
+      status.textContent='The email address is selected. Use your device copy command.';
     }
   });
 

@@ -1,0 +1,110 @@
+[
+  {
+    "name": "argocd",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/argocd/argocd-original.svg"
+  },
+  {
+    "name": "bash",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/bash/bash-original.svg"
+  },
+  {
+    "name": "cloudflare",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/cloudflare/cloudflare-original.svg"
+  },
+  {
+    "name": "docker",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/docker/docker-original.svg"
+  },
+  {
+    "name": "git",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/git/git-original.svg"
+  },
+  {
+    "name": "github",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/github/github-original.svg"
+  },
+  {
+    "name": "githubactions",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/githubactions/githubactions-original.svg"
+  },
+  {
+    "name": "gitlab",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/gitlab/gitlab-original.svg"
+  },
+  {
+    "name": "grafana",
+    "source": "https://cdn.jsdelivr.net/gh/devicons/devicon@master/icons/grafana/grafana-original.svg"
+  },
+  {
+    "name": "helm",
+    "source": "https://cdn.jsdelivr.net/gh/devicons/devicon@master/icons/helm/helm-original.svg"
+  },
+  {
+    "name": "java",
+    "source": "https://cdn.jsdelivr.net/gh/devicons/devicon@master/icons/java/java-original.svg"
+  },
+  {
+    "name": "javascript",
+    "source": "https://cdn.jsdelivr.net/gh/devicons/devicon@master/icons/javascript/javascript-original.svg"
+  },
+  {
+    "name": "jenkins",
+    "source": "https://cdn.jsdelivr.net/gh/devicons/devicon@master/icons/jenkins/jenkins-original.svg"
+  },
+  {
+    "name": "kubernetes",
+    "source": "https://cdn.jsdelivr.net/gh/devicons/devicon@master/icons/kubernetes/kubernetes-original.svg"
+  },
+  {
+    "name": "linux",
+    "source": "https://cdn.jsdelivr.net/gh/devicons/devicon@master/icons/linux/linux-original.svg"
+  },
+  {
+    "name": "mongodb",
+    "source": "https://cdn.jsdelivr.net/gh/devicons/devicon@master/icons/mongodb/mongodb-original.svg"
+  },
+  {
+    "name": "mysql",
+    "source": "https://cdn.jsdelivr.net/gh/devicons/devicon@master/icons/mysql/mysql-original.svg"
+  },
+  {
+    "name": "nginx",
+    "source": "https://cdn.jsdelivr.net/gh/devicons/devicon@master/icons/nginx/nginx-original.svg"
+  },
+  {
+    "name": "nodejs",
+    "source": "https://cdn.jsdelivr.net/gh/devicons/devicon@master/icons/nodejs/nodejs-original.svg"
+  },
+  {
+    "name": "oracle",
+    "source": "https://cdn.jsdelivr.net/gh/devicons/devicon@master/icons/oracle/oracle-original.svg"
+  },
+  {
+    "name": "prometheus",
+    "source": "https://cdn.jsdelivr.net/gh/devicons/devicon@master/icons/prometheus/prometheus-original.svg"
+  },
+  {
+    "name": "python",
+    "source": "https://cdn.jsdelivr.net/gh/devicons/devicon@master/icons/python/python-original.svg"
+  },
+  {
+    "name": "react",
+    "source": "https://cdn.jsdelivr.net/gh/devicons/devicon@master/icons/react/react-original.svg"
+  },
+  {
+    "name": "spring",
+    "source": "https://cdn.jsdelivr.net/gh/devicons/devicon@master/icons/spring/spring-original.svg"
+  },
+  {
+    "name": "terraform",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/terraform/terraform-original.svg"
+  },
+  {
+    "name": "aws",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/amazonwebservices/amazonwebservices-original-wordmark.svg"
+  },
+  {
+    "name": "ecr",
+    "source": "https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v23.1/dist/Containers/ElasticContainerRegistry.png"
+  }
+]

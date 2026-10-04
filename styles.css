@@ -77,6 +77,35 @@ img,svg{max-width:100%}img{display:block}h1,h2,h3,h4,p,ul,ol,figure{margin:0}h1,
 @media(max-width:700px){.project-list{grid-template-columns:1fr}.project-icon-panel{width:100%;height:80px}.project-overview{display:flex;flex-direction:column;gap:17px}}
 @media(max-width:650px){.portrait-badge{width:57px;right:-4px;bottom:-4px;padding:3px;border-radius:8px}.about-socials{margin-top:20px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
+/* Filters follow the supplied outlined tab reference in the TCMS palette. */
+.tool-logo{display:inline-block;width:20px;height:20px;object-fit:contain;flex:none;vertical-align:middle}
+.skill-tags li{display:inline-flex;align-items:center;gap:7px}
+.skill-tags .tool-logo{width:18px;height:18px}
+.workflow-brands{display:flex;align-items:center;justify-content:center;gap:4px;padding:4px;border-radius:7px;background:#fff}
+.workflow-brands .tool-logo{width:25px;height:25px}
+.workflow-brands:has(.tool-logo+.tool-logo) .tool-logo{width:20px;height:20px}
+.workflow-brands:has(.tool-logo+.tool-logo){gap:3px;padding:3px}
+.category-filters{display:none;flex-wrap:wrap;gap:10px;margin:0 0 30px}
+.js .category-filters{display:flex}
+.filter-button{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:9px 14px;border:1px solid #c9d7e3;border-radius:8px;background:#fff;color:var(--navy);font-size:.875rem;font-weight:800;line-height:1.4;box-shadow:0 2px 6px rgba(28,49,86,.035)}
+.filter-button:hover{background:#f0f5f8;border-color:#879ab6}
+.filter-button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff;box-shadow:0 3px 8px rgba(28,49,86,.16)}
+.filter-count{display:grid;place-items:center;min-width:23px;height:23px;padding:0 5px;border-radius:5px;background:#edf2f6;font-size:.8rem;line-height:1}
+.filter-button[aria-pressed="true"] .filter-count{background:rgba(255,255,255,.18);color:#fff}
+.education{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:26px}
+.education .education-grade{margin:16px 0 0}
+.education-grade strong{display:block;font-size:.875rem;color:var(--muted);font-weight:700;margin-bottom:4px}
+.education-grade span{display:block;color:var(--navy);font-size:1rem;font-weight:800}
+.education-coursework{border-left:1px solid var(--line);padding-left:26px}
+.education-coursework h4{font-size:1rem;color:var(--navy);margin-bottom:11px}
+.education .education-coursework p{font-size:.94rem;line-height:1.8;margin-bottom:0}
+.profile-records>.profile-lab-card{grid-column:1/-1}
+.icon-button{display:inline-grid;place-items:center;flex:none;width:44px;height:44px;padding:10px;border:1px solid #d5dfe8;border-radius:9px;background:#f6f9fb;color:var(--navy)}
+.icon-button:hover{background:#eaf0f6;border-color:#8297b2}
+.icon-button.copied{background:#e7f3ed;border-color:#91b6a5;color:#246547}
+.contact-actions{align-items:center}
+@media(max-width:650px){.category-filters{gap:8px;margin-bottom:25px}.filter-button{padding:9px 11px;font-size:.875rem;gap:7px}.education{grid-template-columns:1fr;gap:23px}.education-coursework{border-left:0;border-top:1px solid var(--line);padding:21px 0 0}}
+@media print{.category-filters{display:none!important}[data-filter-category][hidden]{display:block!important}}
 /* Cloud lab and credentials use the same palette and card rhythm as the portfolio. */
 .profile-lab-card,.lab-overview,.lab-card,.certification-featured,.certification-card{background:#fff;border:1px solid rgba(28,49,86,.12);border-radius:17px;box-shadow:0 6px 15px rgba(28,49,86,.055)}
 .profile-lab-card{display:flex;align-items:center;gap:17px;padding:26px 28px;text-decoration:none}
