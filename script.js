@@ -113,11 +113,11 @@
   window.addEventListener('scroll', () => {if (active && !navigating) positions.set(active, window.scrollY);}, {passive:true});
   document.querySelector('.back-to-top').addEventListener('click', () => window.scrollTo({top:0, behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'}));
   renderRoute(window.location.hash);
-  const workflow = document.querySelector('.workflow-visual');
-  if (workflow) {
+  const animatedSections = document.querySelectorAll('.workflow-visual, .direction-flow');
+  if (animatedSections.length) {
     const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
     const updateMotion = () => {
-      workflow.classList.toggle('motion-enabled', !motionPreference.matches);
+      animatedSections.forEach(section => section.classList.toggle('motion-enabled', !motionPreference.matches));
     };
     motionPreference.addEventListener('change', updateMotion);
     updateMotion();
