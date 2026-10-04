@@ -106,5 +106,13 @@
   {
     "name": "ecr",
     "source": "https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v23.1/dist/Containers/ElasticContainerRegistry.png"
+  },
+  {
+    "name": "linkedin",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/linkedin/linkedin-original.svg"
+  },
+  {
+    "name": "medium",
+    "source": "https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/medium.svg"
   }
 ]

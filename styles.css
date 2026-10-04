@@ -37,9 +37,15 @@ img,svg{max-width:100%}img{display:block}h1,h2,h3,h4,p,ul,ol,figure{margin:0}h1,
 @media(max-width:650px){.workflow-visual{padding:22px;margin-bottom:31px}.workflow-track{grid-template-columns:1fr;gap:17px}.workflow-track:before{top:26px;bottom:26px;left:24px;right:auto;width:2px;height:auto}.workflow-step{flex-direction:row;align-items:center;gap:17px;min-height:49px}.workflow-icon{width:49px;height:49px;flex:none;border-radius:12px}.workflow-labels{text-align:left;gap:2px}.workflow-step:not(:last-child):after{left:22px;top:55px}.workflow-visual.motion-enabled .workflow-step:not(:last-child):after{animation-name:workflow-signal-mobile}}
 @keyframes workflow-signal-mobile{0%,3%{left:22px;top:55px;opacity:0}4%{left:22px;top:55px;opacity:.85}17%{left:22px;top:calc(100% + 12px);opacity:.85}19%,100%{left:22px;top:calc(100% + 12px);opacity:0}}
 @media(prefers-reduced-motion:reduce){.workflow-visual.motion-enabled .workflow-icon,.workflow-visual.motion-enabled .workflow-step:after{animation:none!important}.workflow-step:after{display:none}}
+.hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.button-secondary{color:var(--navy);background:rgba(255,255,255,.93);border-color:rgba(28,49,86,.25)}
+.button-secondary:hover{background:#f5f8fb;border-color:var(--navy);text-decoration:none;box-shadow:0 4px 10px rgba(28,49,86,.08)}
 .about-socials{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
-.about-socials a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 13px;border:1px solid rgba(28,49,86,.2);border-radius:8px;background:rgba(255,255,255,.93);color:var(--navy);font-size:.875rem;font-weight:800;text-decoration:none}
+.about-socials a{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:8px 13px;border:1px solid rgba(28,49,86,.2);border-radius:8px;background:rgba(255,255,255,.93);color:var(--navy);font-size:.875rem;font-weight:800;text-decoration:none}
 .about-socials a:hover{border-color:var(--navy);background:#f5f8fb;text-decoration:underline}
+.social-profile{white-space:nowrap}
+.social-profile .tool-logo{display:block;width:20px;height:20px;object-fit:contain;flex-shrink:0}
+.contact-socials .social-profile{min-height:44px}
 .portrait-frame{position:relative}
 .portrait-badge{position:absolute;right:-8px;bottom:-8px;display:block;width:88px;aspect-ratio:1;padding:4px;border:1px solid #e2e7ed;border-radius:12px;background:#fff;box-shadow:0 6px 17px rgba(28,49,86,.14);line-height:0}
 .portrait-badge:hover{box-shadow:0 8px 21px rgba(28,49,86,.22)}
