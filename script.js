@@ -70,7 +70,6 @@
       if (link.dataset.nav === active) link.setAttribute('aria-current', 'page');
       else link.removeAttribute('aria-current');
     });
-    if (target?.classList.contains('project')) target.querySelector('.project-expand').open = true;
     const group = target?.closest('[data-filter-category]');
     if (group?.hidden) filterControllers.get(page.id)?.apply(group.dataset.filterCategory);
     setMenu(false, false);
@@ -159,37 +158,4 @@
     }
   });
 
-  const evidence=JSON.parse(document.getElementById('eks-evidence-data').textContent);
-  const dialog=document.querySelector('.evidence-dialog');
-  const title=document.getElementById('evidence-title');
-  const image=document.getElementById('evidence-image');
-  const caption=document.getElementById('evidence-caption');
-  const position=document.getElementById('evidence-position');
-  const original=document.getElementById('evidence-original');
-  let current=0;let returnFocus;
-  const show=(index)=>{
-    current=(index+evidence.length)%evidence.length;const item=evidence[current];
-    title.textContent=item.title;image.src=item.src;image.alt=item.title+'. '+item.caption;
-    caption.textContent=item.caption;position.textContent=(current+1)+' of '+evidence.length;original.href=item.src;
-  };
-  document.querySelectorAll('[data-evidence]').forEach(trigger=>{
-    trigger.addEventListener('click',event=>{
-      if(typeof dialog.showModal!=='function')return;
-      if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
-      event.preventDefault();returnFocus=trigger;show(Number(trigger.dataset.evidence));dialog.showModal();document.body.classList.add('dialog-open');
-    });
-  });
-  document.getElementById('evidence-prev').addEventListener('click',()=>show(current-1));
-  document.getElementById('evidence-next').addEventListener('click',()=>show(current+1));
-  dialog.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());
-  dialog.addEventListener('keydown',event=>{
-    if(event.key==='ArrowLeft'){event.preventDefault();show(current-1);}
-    if(event.key==='ArrowRight'){event.preventDefault();show(current+1);}
-  });
-  dialog.addEventListener('click',event=>{
-    if(event.target!==dialog)return;
-    const r=dialog.getBoundingClientRect();
-    if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();
-  });
-  dialog.addEventListener('close',()=>{document.body.classList.remove('dialog-open');returnFocus?.focus();});
 })();
