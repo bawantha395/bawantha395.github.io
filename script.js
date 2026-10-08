@@ -12,6 +12,7 @@
   const names = {about:'About', experience:'Experience', projects:'Projects', cloudlab:'Cloud Lab', skills:'Skills', certifications:'Certifications', blog:'Articles', contact:'Contact'};
   const aliases = {top:'about', resume:'contact', homelab:'cloudlab', 'cloud-lab':'cloudlab'};
   let active = '', menuOpen = false, navigating = false, frame = 0;
+  let returningFromCapture = false;
   document.documentElement.classList.add('js');
   if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
   const setMenu = (open, focusMenu = true) => {
@@ -107,7 +108,18 @@
     if (window.location.hash !== hash) window.history.pushState(null, '', hash);
     renderRoute(hash, true);
   });
-  window.addEventListener('popstate', () => renderRoute(window.location.hash, true));
+  window.addEventListener('popstate', () => {
+    // A capture adds a history entry on the same route. Closing it should
+    // preserve focus on the evidence link rather than refocusing the page.
+    const samePage = targetFor(window.location.hash).page.id === active;
+    const captureOpen = document.getElementById('lab-evidence-viewer')?.open;
+    if (samePage && (captureOpen || returningFromCapture)) {
+      returningFromCapture = false;
+      return;
+    }
+    returningFromCapture = false;
+    renderRoute(window.location.hash, true);
+  });
   window.addEventListener('hashchange', () => renderRoute(window.location.hash, true));
   window.addEventListener('scroll', () => {if (active && !navigating) positions.set(active, window.scrollY);}, {passive:true});
   document.querySelector('.back-to-top').addEventListener('click', () => window.scrollTo({top:0, behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'}));
@@ -157,5 +169,64 @@
       status.textContent='The email address is selected. Use your device copy command.';
     }
   });
+
+  // Cloud Lab captures open without leaving the current portfolio page.
+  const captureDialog = document.getElementById('lab-evidence-viewer');
+  const captureSource = document.querySelector('[data-slideshow="eks"] .slideshow-data');
+  if (captureDialog && captureSource) {
+    const captures = JSON.parse(captureSource.textContent);
+    const captureImage = document.getElementById('lab-evidence-image');
+    const captureTitle = document.getElementById('lab-evidence-title');
+    const captureCaption = document.getElementById('lab-evidence-caption');
+    const captureOrigin = document.getElementById('lab-evidence-origin');
+    const returnButton = captureDialog.querySelector('.lab-evidence-close');
+    let captureOpener = null, captureScroll = 0, captureHistoryKey = '', captureCounter = 0;
+
+    document.querySelectorAll('a[data-evidence]').forEach(link => {
+      link.addEventListener('click', event => {
+        if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+        if (typeof captureDialog.showModal !== 'function') return;
+        const capture = captures[Number(link.dataset.evidence)];
+        if (!capture) return;
+        event.preventDefault();
+        captureOpener = link;
+        captureScroll = window.scrollY;
+        const origin = link.closest('[data-page]')?.id;
+        const returnName = origin === 'cloudlab' ? 'Cloud Lab' : (names[origin] || 'Portfolio');
+        captureOrigin.textContent = returnName;
+        returnButton.textContent = 'Back to '+returnName;
+        captureImage.src = capture.src;
+        captureImage.alt = capture.title+'. '+capture.caption;
+        captureTitle.textContent = capture.title;
+        captureCaption.textContent = capture.caption;
+        captureHistoryKey = 'portfolio-capture-'+Date.now()+'-'+(++captureCounter);
+        captureDialog.showModal();
+        document.body.classList.add('lab-evidence-open');
+        window.history.pushState({...window.history.state, portfolioCapture:captureHistoryKey}, '', window.location.href);
+        returnButton.focus({preventScroll:true});
+      });
+    });
+    returnButton.addEventListener('click', () => captureDialog.close());
+    captureDialog.addEventListener('click', event => {
+      if (event.target !== captureDialog) return;
+      const bounds = captureDialog.getBoundingClientRect();
+      if (event.clientX < bounds.left || event.clientX > bounds.right ||
+          event.clientY < bounds.top || event.clientY > bounds.bottom) captureDialog.close();
+    });
+    captureDialog.addEventListener('close', () => {
+      document.body.classList.remove('lab-evidence-open');
+      // Remove only this viewer's history entry, so the browser Back button
+      // and the visible return button both restore the same portfolio view.
+      if (window.history.state?.portfolioCapture === captureHistoryKey) {
+        returningFromCapture = true;
+        window.history.back();
+      }
+      captureOpener?.focus({preventScroll:true});
+      window.requestAnimationFrame(() => window.scrollTo({top:captureScroll, behavior:'instant'}));
+    });
+    window.addEventListener('popstate', () => {
+      if (captureDialog.open && window.history.state?.portfolioCapture !== captureHistoryKey) captureDialog.close();
+    });
+  }
 
 })();
