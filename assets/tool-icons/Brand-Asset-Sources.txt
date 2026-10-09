@@ -1,0 +1,22 @@
+Technology logos identify tools used in the portfolio. They do not imply endorsement.
+
+AWS service icons: official AWS Architecture Icons package, release 31 July 2026.
+https://aws.amazon.com/architecture/icons/
+Individual SVG files are unmodified.
+
+Kustomize: official kubernetes-sigs/kustomize repository, site favicon.
+https://github.com/kubernetes-sigs/kustomize
+
+Material UI: official MUI Core light-mode branding asset.
+https://mui.com/material-ui/
+
+Tailwind CSS: official Tailwind CSS repository brand mark.
+https://tailwindcss.com/brand
+The Tailwind name and logos are trademarks of Tailwind Labs Inc.
+
+Other technology brand icons: original-colour Devicon assets.
+https://github.com/devicons/devicon
+See Devicon-LICENSE.txt and sources.json for exact provenance.
+
+WSO2: official WSO2 black logo, used to identify WSO2 API Manager.
+https://wso2.com/
