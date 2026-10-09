@@ -193,13 +193,15 @@
   revealMotion.addEventListener('change', setupReveals);
   setupReveals();
 
-  const walkthroughToggle = document.getElementById('eks-walkthrough-toggle');
-  const walkthrough = document.getElementById('eks-walkthrough');
-  walkthroughToggle?.addEventListener('click', () => {
-    const expanded = walkthroughToggle.getAttribute('aria-expanded') !== 'true';
-    walkthrough.hidden = !expanded;
-    walkthroughToggle.setAttribute('aria-expanded', String(expanded));
-    walkthroughToggle.textContent = expanded ? 'Hide the walkthrough' : 'Watch the walkthrough';
+  document.querySelectorAll('[data-walkthrough-toggle]').forEach(button => {
+    const walkthrough = document.getElementById(button.getAttribute('aria-controls'));
+    button.addEventListener('click', () => {
+      const expanded = button.getAttribute('aria-expanded') !== 'true';
+      walkthrough.hidden = !expanded;
+      button.setAttribute('aria-expanded', String(expanded));
+      button.textContent = expanded ? 'Hide the walkthrough' : 'Watch the walkthrough';
+      walkthrough.dispatchEvent(new CustomEvent('walkthrough:toggle', {detail: {expanded}}));
+    });
   });
 
   const hero = document.querySelector('.hero');

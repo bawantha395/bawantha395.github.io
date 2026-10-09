@@ -70,6 +70,18 @@
       if (manual) announcement.textContent = `${label}: ${slide.title}`;
     };
 
+    // AWS deployment and paper playback retain their existing autoplay behavior
+    // when opened. The EKS walkthrough still waits for an explicit Play action.
+    gallery.closest('[data-walkthrough]')?.addEventListener('walkthrough:toggle', event => {
+      if (!event.detail.expanded) paused = true;
+      else if (gallery.dataset.autoplay !== 'false' && !motion.matches) {
+        paused = false;
+        hovered = false;
+        focused = false;
+      }
+      schedule();
+    });
+
     image.addEventListener('error', () => { error.hidden = false; });
     image.addEventListener('load', () => { error.hidden = true; });
     gallery.querySelector('[data-slide-action="previous"]').addEventListener('click', () => {
