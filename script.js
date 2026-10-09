@@ -125,7 +125,7 @@
   window.addEventListener('scroll', () => {if (active && !navigating) positions.set(active, window.scrollY);}, {passive:true});
   document.querySelector('.back-to-top').addEventListener('click', () => window.scrollTo({top:0, behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'}));
   renderRoute(window.location.hash);
-  const animatedSections = document.querySelectorAll('.workflow-visual, .direction-flow');
+  const animatedSections = document.querySelectorAll('.workflow-visual, .direction-flow, .hero-ship-link');
   if (animatedSections.length) {
     const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
     const updateMotion = () => {
@@ -134,6 +134,72 @@
     motionPreference.addEventListener('change', updateMotion);
     updateMotion();
   }
+
+  // Decorative motion runs only while its target is visible. It does not represent a live deployment.
+  const workflowVisual = document.querySelector('.workflow-visual');
+  const workflowTrack = workflowVisual?.querySelector('.workflow-track');
+  const workflowToggle = workflowVisual?.querySelector('.workflow-motion-toggle');
+  const attentionTargets = [workflowVisual, document.querySelector('.hero-ship-link')].filter(Boolean);
+  const attentionMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const attentionVisible = new Map(attentionTargets.map(target => [target, false]));
+  let workflowPaused = false;
+  const updateAttention = () => {
+    attentionTargets.forEach(target => target.classList.toggle('is-motion-active',
+      !attentionMotion.matches && !document.hidden && attentionVisible.get(target) &&
+      (target !== workflowVisual || !workflowPaused)));
+    if (workflowToggle) workflowToggle.hidden = attentionMotion.matches;
+  };
+  if ('IntersectionObserver' in window) {
+    const attentionObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => attentionVisible.set(entry.target === workflowTrack ? workflowVisual : entry.target, entry.isIntersecting));
+      updateAttention();
+    });
+    attentionTargets.forEach(target => attentionObserver.observe(target === workflowVisual ? workflowTrack : target));
+  } else {
+    attentionTargets.forEach(target => attentionVisible.set(target, true));
+  }
+  document.addEventListener('visibilitychange', updateAttention);
+  attentionMotion.addEventListener('change', updateAttention);
+  workflowToggle?.addEventListener('click', () => {
+    workflowPaused = !workflowPaused;
+    workflowToggle.setAttribute('aria-pressed', String(workflowPaused));
+    workflowToggle.setAttribute('aria-label', workflowPaused ? 'Resume workflow animation' : 'Pause workflow animation');
+    workflowToggle.textContent = workflowPaused ? 'Play animation' : 'Pause animation';
+    updateAttention();
+  });
+  updateAttention();
+
+  // Measure icon centers so the same connector works across the horizontal and mobile layouts.
+  const measureWorkflow = () => {
+    if (!workflowTrack || !workflowTrack.getClientRects().length) return;
+    const icons = [...workflowTrack.querySelectorAll('.workflow-icon')];
+    const bounds = workflowTrack.getBoundingClientRect();
+    const centers = icons.map(icon => {
+      const rect = icon.getBoundingClientRect();
+      return {x: rect.left + rect.width / 2 - bounds.left, y: rect.top + rect.height / 2 - bounds.top};
+    });
+    const first = centers[0], last = centers[centers.length - 1];
+    if (!first || !last) return;
+    const dx = last.x - first.x, dy = last.y - first.y;
+    const vertical = Math.abs(dy) > Math.abs(dx);
+    const variables = {
+      '--workflow-line-x': first.x - (vertical ? 1 : 0),
+      '--workflow-line-y': first.y - (vertical ? 0 : 1),
+      '--workflow-line-width': vertical ? 2 : dx,
+      '--workflow-line-height': vertical ? dy : 2,
+      '--workflow-dot-x': first.x, '--workflow-dot-y': first.y,
+      '--workflow-distance-x': dx, '--workflow-distance-y': dy,
+    };
+    Object.entries(variables).forEach(([name, value]) => workflowTrack.style.setProperty(name, value + 'px'));
+    const length = Math.hypot(dx, dy);
+    icons.forEach((icon, index) => icon.style.setProperty('--workflow-stage-delay',
+      (length ? Math.hypot(centers[index].x - first.x, centers[index].y - first.y) / length * 6 : 0) + 's'));
+  };
+  if (workflowTrack && 'ResizeObserver' in window) new ResizeObserver(measureWorkflow).observe(workflowTrack);
+  window.addEventListener('resize', measureWorkflow);
+  new MutationObserver(measureWorkflow).observe(document.body, {attributes: true, attributeFilter: ['data-page']});
+  if (document.fonts?.ready) document.fonts.ready.then(measureWorkflow);
+  measureWorkflow();
 
   // Measure the marker centers so the traveller stays inside its own rail,
   // even when summaries wrap differently on a phone or after fonts load.

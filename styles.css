@@ -710,6 +710,84 @@ body[data-page="cloudlab"] #main { max-width: 1440px; }
 .workflow-step-link:hover .workflow-view-hint, .workflow-step-link:focus-visible .workflow-view-hint { opacity: 1; }
 .workflow-visual.motion-enabled .workflow-icon,
 .workflow-visual.motion-enabled .workflow-step:not(:last-child)::after { animation: none; }
+
+/* The connector and halos show the delivery sequence without moving the labels. */
+.workflow-step:not(:last-child)::after { display: none; }
+.workflow-track::before {
+  left: var(--workflow-line-x, 10%);
+  top: var(--workflow-line-y, 26px);
+  right: auto;
+  bottom: auto;
+  width: var(--workflow-line-width, 80%);
+  height: var(--workflow-line-height, 2px);
+}
+.workflow-track::after {
+  content: '';
+  position: absolute;
+  left: var(--workflow-dot-x, 10%);
+  top: var(--workflow-dot-y, 27px);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #318761;
+  box-shadow: 0 0 0 4px rgba(49, 135, 97, .12);
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: -1;
+}
+.workflow-icon { position: relative; isolation: isolate; }
+.workflow-icon::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 2px solid #67a68a;
+  border-radius: 17px;
+  box-shadow: 0 0 0 5px rgba(49, 135, 97, .09);
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+.workflow-visual.motion-enabled .workflow-track::after {
+  animation: workflow-route-flow 7.5s linear infinite;
+  animation-play-state: paused;
+}
+.workflow-visual.motion-enabled .workflow-icon::before {
+  animation: workflow-node-glow 7.5s ease-in-out infinite;
+  animation-delay: var(--workflow-stage-delay, 0s);
+  animation-play-state: paused;
+}
+.workflow-visual.motion-enabled.is-motion-active .workflow-track::after,
+.workflow-visual.motion-enabled.is-motion-active .workflow-icon::before { animation-play-state: running; }
+.workflow-visual.motion-enabled.is-motion-active .workflow-track:focus-within::after,
+.workflow-visual.motion-enabled.is-motion-active .workflow-track:focus-within .workflow-icon::before { animation-play-state: paused; }
+@media (hover: hover) and (pointer: fine) {
+  .workflow-visual.motion-enabled.is-motion-active .workflow-track:hover::after,
+  .workflow-visual.motion-enabled.is-motion-active .workflow-track:hover .workflow-icon::before { animation-play-state: paused; }
+}
+@keyframes workflow-route-flow {
+  0% { opacity: 0; transform: translate(-50%, -50%) translate(0, 0); }
+  2% { opacity: .9; }
+  80% { opacity: .9; transform: translate(-50%, -50%) translate(var(--workflow-distance-x, 0px), var(--workflow-distance-y, 0px)); }
+  84%, 100% { opacity: 0; transform: translate(-50%, -50%) translate(var(--workflow-distance-x, 0px), var(--workflow-distance-y, 0px)); }
+}
+@keyframes workflow-node-glow {
+  0%, 20%, 100% { opacity: 0; }
+  3%, 12% { opacity: .85; }
+}
+.workflow-motion-toggle {
+  padding: 7px 11px;
+  border: 1px solid #d1ded9;
+  border-radius: 8px;
+  background: #f3f8f5;
+  color: var(--navy);
+  font-size: .8rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+.workflow-motion-toggle[hidden] { display: none; }
+.workflow-motion-toggle:hover { background: #e8f3ec; }
+.workflow-motion-toggle:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
 #delivery-pipeline { scroll-margin-top: 95px; }
 #delivery-pipeline:focus { outline: none; }
 @media (hover: none) { .workflow-view-hint { opacity: 1; } }
@@ -755,12 +833,48 @@ body[data-page="cloudlab"] #main { max-width: 1440px; }
 }
 
 /* Keep the background paragraphs before the actions, with the workflow beneath the results. */
-body[data-page="about"] #main { padding-top: 24px; }
-.hero { padding-top: 0; }
 .hero-copy .hero-actions { margin-top: 0; }
-.hero-copy .about-socials { margin-top: 22px; margin-bottom: 0; }
-.hero-workflow-action { width: 100%; max-width: 390px; }
-.hero-workflow-action .hero-ship-link { margin-top: 0; }
+.hero-copy { align-self: start; }
+.hero-workflow-action { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 390px; }
+.hero-workflow-action .hero-ship-link {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  margin-top: 0;
+  border: 1px solid #c6ded0;
+  border-radius: 10px;
+  background: #edf7f0;
+  text-decoration: none;
+}
+.hero-ship-link::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 45%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .9), transparent);
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+.hero-ship-link.motion-enabled::after { animation: workflow-link-sweep 5.6s ease-in-out infinite; animation-play-state: paused; }
+.hero-ship-link.motion-enabled.is-motion-active::after { animation-play-state: running; }
+.hero-ship-link.motion-enabled.is-motion-active:hover::after,
+.hero-ship-link.motion-enabled.is-motion-active:focus-visible::after { animation-play-state: paused; }
+.hero-ship-link:hover { background: #e2f1e7; border-color: #91bba2; }
+.hero-ship-link:focus-visible { outline: 3px solid var(--teal); outline-offset: 4px; }
+@keyframes workflow-link-sweep {
+  0%, 12% { opacity: 0; transform: translateX(-110%); }
+  15% { opacity: .75; }
+  36% { opacity: .75; transform: translateX(330%); }
+  39%, 100% { opacity: 0; transform: translateX(330%); }
+}
+.hero-workflow-action .about-socials { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; width: 100%; margin: 0; }
+.hero-workflow-action .social-profile { justify-content: center; min-width: 0; min-height: 44px; padding: 9px 10px; transition: transform .18s ease-out; }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) { .hero-workflow-action .social-profile:hover { transform: translateY(-3px); } }
 .hero-result-summary { width: 100%; max-width: 390px; }
 .hero-results-label { margin: 0 0 10px; font-size: .8rem; font-weight: 800; color: var(--navy); }
 .hero-result-card > .hero-result-context { font-size: .68rem; font-weight: 800; color: var(--teal); line-height: 1.4; margin-bottom: 7px; }
@@ -776,26 +890,13 @@ body[data-page="about"] #main { padding-top: 24px; }
   .hero-result-card > .hero-result-value { grid-column: 2; margin: 0; }
   .hero-result-card > .hero-result-description { grid-column: 1 / -1; margin-top: 5px; }
 }
-@media (max-width: 900px) {
-  body[data-page="about"] #main { padding-top: 22px; }
-}
 @media (max-width: 900px) and (min-width: 651px) {
   .hero-result-summary, .hero-workflow-action { max-width: 430px; }
 }
 @media (max-width: 650px) {
-  body[data-page="about"] #main { padding-top: 18px; }
   .hero-result-summary, .hero-workflow-action { max-width: none; }
 }
 @media (max-width: 340px) { .hero-result-summary { display: none; } }
-
-/* A little less space around each of the three direction steps. */
-.direction-card { padding: 24px; }
-.direction-card .card-heading { margin-bottom: 14px; }
-.direction-flow { --direction-gap: 18px; }
-.direction-content h4 { margin-bottom: 6px; }
-.direction-content p.direction-detail { margin-top: 6px; }
-.direction-articles-link { margin-top: 8px; }
-@media (max-width: 650px) { .direction-card { padding: 20px; } }
 
 /* Explain which personal project the delivery steps belong to. */
 .workflow-heading { margin-bottom: 25px; }
