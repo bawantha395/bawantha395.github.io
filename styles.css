@@ -754,10 +754,13 @@ body[data-page="cloudlab"] #main { max-width: 1440px; }
   .portrait-frame { transform: none!important; }
 }
 
-/* Show the next actions before the longer background text. */
-.hero-copy .hero-actions { margin-top: 4px; }
-.hero-copy .hero-ship-link { margin-top: 15px; }
-.hero-copy .about-socials { margin-top: 16px; margin-bottom: 25px; }
+/* Keep the background paragraphs before the actions, with the workflow beneath the results. */
+body[data-page="about"] #main { padding-top: 24px; }
+.hero { padding-top: 0; }
+.hero-copy .hero-actions { margin-top: 0; }
+.hero-copy .about-socials { margin-top: 22px; margin-bottom: 0; }
+.hero-workflow-action { width: 100%; max-width: 390px; }
+.hero-workflow-action .hero-ship-link { margin-top: 0; }
 .hero-result-summary { width: 100%; max-width: 390px; }
 .hero-results-label { margin: 0 0 10px; font-size: .8rem; font-weight: 800; color: var(--navy); }
 .hero-result-card > .hero-result-context { font-size: .68rem; font-weight: 800; color: var(--teal); line-height: 1.4; margin-bottom: 7px; }
@@ -773,9 +776,26 @@ body[data-page="cloudlab"] #main { max-width: 1440px; }
   .hero-result-card > .hero-result-value { grid-column: 2; margin: 0; }
   .hero-result-card > .hero-result-description { grid-column: 1 / -1; margin-top: 5px; }
 }
-@media (max-width: 900px) and (min-width: 651px) { .hero-result-summary { max-width: 430px; } }
-@media (max-width: 650px) { .hero-result-summary { max-width: none; } }
+@media (max-width: 900px) {
+  body[data-page="about"] #main { padding-top: 22px; }
+}
+@media (max-width: 900px) and (min-width: 651px) {
+  .hero-result-summary, .hero-workflow-action { max-width: 430px; }
+}
+@media (max-width: 650px) {
+  body[data-page="about"] #main { padding-top: 18px; }
+  .hero-result-summary, .hero-workflow-action { max-width: none; }
+}
 @media (max-width: 340px) { .hero-result-summary { display: none; } }
+
+/* A little less space around each of the three direction steps. */
+.direction-card { padding: 24px; }
+.direction-card .card-heading { margin-bottom: 14px; }
+.direction-flow { --direction-gap: 18px; }
+.direction-content h4 { margin-bottom: 6px; }
+.direction-content p.direction-detail { margin-top: 6px; }
+.direction-articles-link { margin-top: 8px; }
+@media (max-width: 650px) { .direction-card { padding: 20px; } }
 
 /* Explain which personal project the delivery steps belong to. */
 .workflow-heading { margin-bottom: 25px; }
