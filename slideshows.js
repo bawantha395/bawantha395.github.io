@@ -25,10 +25,10 @@
     gallery.style.setProperty('--slide-duration', `${interval}ms`);
 
     let current = 0, timer = null, visible = false;
-    let paused = motion.matches, hovered = false, focused = false;
+    let paused = motion.matches || gallery.dataset.autoplay === 'false', hovered = false, focused = false;
     let fullscreenFallback = false;
     const isFullscreen = () => document.fullscreenElement === gallery || fullscreenFallback;
-    const canPlay = () => !paused && !document.hidden && !gallery.closest('[hidden]') &&
+    const canPlay = () => !motion.matches && !paused && !document.hidden && !gallery.closest('[hidden]') &&
       (isFullscreen() || (visible && !hovered && !focused));
 
     const preloadNext = () => {
@@ -38,12 +38,14 @@
     const schedule = () => {
       clearTimeout(timer);
       timer = null;
+      if (gallery.closest('[data-walkthrough][hidden]')) paused = true;
       const playing = canPlay();
       gallery.dataset.playing = String(playing);
       toggle.textContent = paused ? 'Play' : 'Pause';
       toggle.setAttribute('aria-pressed', String(paused));
       toggle.setAttribute('aria-label', `${paused ? 'Play' : 'Pause'} ${heading}`);
-      state.textContent = paused ? 'Paused' : (playing ? 'Autoplay' : 'Ready');
+      toggle.disabled = motion.matches;
+      state.textContent = motion.matches ? 'Manual view' : (paused ? 'Paused' : (playing ? 'Playing' : 'Ready'));
       progress.style.animation = 'none';
       if (playing) {
         void progress.offsetWidth;
@@ -77,6 +79,7 @@
       render(current + 1, true); schedule();
     });
     toggle.addEventListener('click', () => {
+      if (motion.matches) return;
       paused = !paused;
       // An explicit Play action should start even while its button has focus.
       if (!paused) { hovered = false; focused = false; }
@@ -163,7 +166,7 @@
 
   // Navigation and category filters must never keep hidden project slides playing.
   const observer = new MutationObserver(() => controllers.forEach(controller => controller.schedule()));
-  document.querySelectorAll('[data-page], [data-filter-category]').forEach(node => {
+  document.querySelectorAll('[data-page], [data-filter-category], [data-walkthrough]').forEach(node => {
     observer.observe(node, {attributes: true, attributeFilter: ['hidden']});
   });
 })();

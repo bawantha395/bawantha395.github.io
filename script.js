@@ -57,7 +57,7 @@
     const target = document.getElementById(id), page = target?.closest('[data-page]');
     return {page:page || pages[0], target:page ? target : null};
   };
-  const renderRoute = (hash, focus = false) => {
+  const renderRoute = (hash, focus = false, smooth = false) => {
     const {page, target} = targetFor(hash), changed = active !== page.id;
     if (active && !navigating) positions.set(active, window.scrollY);
     navigating = true;
@@ -74,10 +74,11 @@
     const group = target?.closest('[data-filter-category]');
     if (group?.hidden) filterControllers.get(page.id)?.apply(group.dataset.filterCategory);
     setMenu(false, false);
-    if (focus) page.focus({preventScroll:true});
+    if (focus) (target?.id === 'delivery-pipeline' ? target : page).focus({preventScroll:true});
     frame = window.requestAnimationFrame(() => {
       const y = target ? Math.max(0, target.getBoundingClientRect().top + window.scrollY - 100) : (positions.get(active) || 0);
-      window.scrollTo({top:y, behavior:'instant'});
+      const animateScroll = smooth && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({top:y, behavior:animateScroll ? 'smooth' : 'instant'});
       frame = window.requestAnimationFrame(() => {
         positions.set(active, window.scrollY);
         navigating = false;
@@ -106,7 +107,7 @@
     event.preventDefault();
     if (!navigating && active) positions.set(active, window.scrollY);
     if (window.location.hash !== hash) window.history.pushState(null, '', hash);
-    renderRoute(hash, true);
+    renderRoute(hash, true, link.matches('.hero-ship-link, .hero-contact, .topbar-contact'));
   });
   window.addEventListener('popstate', () => {
     // A capture adds a history entry on the same route. Closing it should
@@ -132,6 +133,175 @@
     };
     motionPreference.addEventListener('change', updateMotion);
     updateMotion();
+  }
+
+  // Measure the marker centers so the traveller stays inside its own rail,
+  // even when summaries wrap differently on a phone or after fonts load.
+  const directionFlow = document.querySelector('.direction-flow');
+  const directionTrack = directionFlow?.querySelector('.direction-timeline-track');
+  const measureDirection = () => {
+    if (!directionTrack || !directionFlow.getClientRects().length) return;
+    const markers = [...directionFlow.querySelectorAll('.direction-marker')];
+    const flowBounds = directionFlow.getBoundingClientRect();
+    const first = markers[0].getBoundingClientRect();
+    const last = markers[markers.length - 1].getBoundingClientRect();
+    const start = first.top + first.height / 2 - flowBounds.top;
+    const length = last.top + last.height / 2 - flowBounds.top - start;
+    directionTrack.style.top = start + 'px';
+    directionTrack.style.height = length + 'px';
+    directionTrack.style.setProperty('--direction-travel', Math.max(0, length - 6) + 'px');
+  };
+  if (directionTrack) {
+    if ('ResizeObserver' in window) new ResizeObserver(measureDirection).observe(directionFlow);
+    window.addEventListener('resize', measureDirection);
+    document.fonts?.ready.then(measureDirection);
+    measureDirection();
+  }
+
+  // Keep every card readable without JavaScript or with reduced motion.
+  const revealCards = [...document.querySelectorAll(
+    '.direction-card, .interests-card, .education, .credential, .profile-lab-card, ' +
+    '.experience-current, .experience-previous, .project, .skill-card, ' +
+    '.lab-overview, .lab-card, .certification-featured, .certification-card, ' +
+    '.article-group, .contact-layout'
+  )];
+  const revealMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let revealObserver;
+  const revealCard = card => {
+    card.classList.add('is-revealed');
+    revealObserver?.unobserve(card);
+  };
+  const setupReveals = () => {
+    if (revealMotion.matches || !('IntersectionObserver' in window)) {
+      revealObserver?.disconnect();
+      document.documentElement.classList.remove('reveal-ready');
+      revealCards.forEach(revealCard);
+      return;
+    }
+    if (!revealObserver) {
+      revealObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => { if (entry.isIntersecting) revealCard(entry.target); });
+      }, {threshold: 0.04, rootMargin: '0px 0px -20px 0px'});
+    }
+    revealCards.forEach(card => {
+      card.classList.add('reveal-card');
+      if (!card.classList.contains('is-revealed')) revealObserver.observe(card);
+    });
+    document.documentElement.classList.add('reveal-ready');
+  };
+  revealCards.forEach(card => card.addEventListener('focusin', () => revealCard(card)));
+  revealMotion.addEventListener('change', setupReveals);
+  setupReveals();
+
+  const walkthroughToggle = document.getElementById('eks-walkthrough-toggle');
+  const walkthrough = document.getElementById('eks-walkthrough');
+  walkthroughToggle?.addEventListener('click', () => {
+    const expanded = walkthroughToggle.getAttribute('aria-expanded') !== 'true';
+    walkthrough.hidden = !expanded;
+    walkthroughToggle.setAttribute('aria-expanded', String(expanded));
+    walkthroughToggle.textContent = expanded ? 'Hide the walkthrough' : 'Watch the walkthrough';
+  });
+
+  const hero = document.querySelector('.hero');
+  if (hero) {
+    const heroMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const heroSmallScreen = window.matchMedia('(max-width: 650px)');
+    const moreToggle = document.getElementById('hero-more-toggle');
+    const moreCopy = document.getElementById('hero-research-copy');
+    const updateMore = () => {
+      moreCopy.hidden = heroSmallScreen.matches && moreToggle.getAttribute('aria-expanded') !== 'true';
+    };
+    moreToggle.addEventListener('click', () => {
+      const expanded = moreToggle.getAttribute('aria-expanded') !== 'true';
+      moreToggle.setAttribute('aria-expanded', String(expanded));
+      moreToggle.textContent = expanded ? 'Less about me' : 'More about me';
+      updateMore();
+    });
+    heroSmallScreen.addEventListener('change', updateMore);
+    updateMore();
+
+    hero.querySelectorAll('[data-hero-order]').forEach(element => {
+      element.style.setProperty('--hero-delay', Math.min(Number(element.dataset.heroOrder) * .07, .56) + 's');
+    });
+    if (!heroMotion.matches) hero.classList.add('hero-ready');
+
+    const counters = [...hero.querySelectorAll('[data-hero-counter]')];
+    const setHeroNumbers = progress => counters.forEach(element => {
+      if (element.dataset.heroCounter === 'time') {
+        const seconds = Math.round(Number(element.dataset.final) * progress);
+        element.textContent = Math.floor(seconds / 60) + ' min ' + String(seconds % 60).padStart(2, '0') + ' sec';
+      } else {
+        element.textContent = Math.round(1 + (Number(element.dataset.final) - 1) * progress) + ' replicas';
+      }
+    });
+    let counterFrame = 0, counterDelay = 0, numbersStarted = false;
+    const startHeroNumbers = () => {
+      if (numbersStarted) return;
+      numbersStarted = true;
+      if (heroMotion.matches) { setHeroNumbers(1); return; }
+      setHeroNumbers(0);
+      counterDelay = window.setTimeout(() => {
+        const started = performance.now();
+        const advance = now => {
+          const progress = Math.min(1, (now - started) / 600);
+          setHeroNumbers(1 - Math.pow(1 - progress, 3));
+          if (progress < 1 && !heroMotion.matches) counterFrame = requestAnimationFrame(advance);
+          else setHeroNumbers(1);
+        };
+        counterFrame = requestAnimationFrame(advance);
+      }, 850);
+    };
+    if ('IntersectionObserver' in window) {
+      const heroNumberObserver = new IntersectionObserver(entries => {
+        if (entries.some(entry => entry.isIntersecting)) { startHeroNumbers(); heroNumberObserver.disconnect(); }
+      });
+      heroNumberObserver.observe(hero);
+    } else startHeroNumbers();
+
+    const contactButton = document.querySelector('.topbar-contact');
+    const updateTopContact = () => {
+      const contentEnd = Math.max(...[...hero.children].map(element => element.getBoundingClientRect().bottom));
+      const visible = active !== 'about' || contentEnd <= document.querySelector('.page-topbar').offsetHeight;
+      contactButton.classList.toggle('is-visible', visible);
+      contactButton.setAttribute('aria-hidden', String(!visible));
+      contactButton.tabIndex = visible ? 0 : -1;
+    };
+    window.addEventListener('scroll', updateTopContact, {passive:true});
+    window.addEventListener('resize', updateTopContact);
+    new MutationObserver(updateTopContact).observe(document.body, {attributes:true, attributeFilter:['data-page']});
+    if ('ResizeObserver' in window) new ResizeObserver(updateTopContact).observe(hero);
+    updateTopContact();
+
+    const portrait = hero.querySelector('.portrait-frame');
+    const photoSurface = hero.querySelector('.hero-photo-content');
+    const mouseDesktop = window.matchMedia('(min-width: 901px) and (hover: hover) and (pointer: fine)');
+    let portraitFrame = 0;
+    const resetPortrait = () => {
+      cancelAnimationFrame(portraitFrame);
+      portrait.style.setProperty('--portrait-x', '0px');
+      portrait.style.setProperty('--portrait-y', '0px');
+    };
+    photoSurface.addEventListener('pointermove', event => {
+      if (!mouseDesktop.matches || heroMotion.matches || event.pointerType !== 'mouse') return;
+      const bounds = photoSurface.getBoundingClientRect();
+      const x = Math.max(-1, Math.min(1, (event.clientX - bounds.left) / bounds.width * 2 - 1)) * 4;
+      const y = Math.max(-1, Math.min(1, (event.clientY - bounds.top) / bounds.height * 2 - 1)) * 4;
+      cancelAnimationFrame(portraitFrame);
+      portraitFrame = requestAnimationFrame(() => {
+        portrait.style.setProperty('--portrait-x', x + 'px');
+        portrait.style.setProperty('--portrait-y', y + 'px');
+      });
+    });
+    photoSurface.addEventListener('pointerleave', resetPortrait);
+    mouseDesktop.addEventListener('change', resetPortrait);
+    heroMotion.addEventListener('change', event => {
+      if (!event.matches) return;
+      hero.classList.remove('hero-ready');
+      clearTimeout(counterDelay);
+      cancelAnimationFrame(counterFrame);
+      setHeroNumbers(1);
+      resetPortrait();
+    });
   }
   document.addEventListener('keydown', event => {
     if (!menuOpen) return;
@@ -194,7 +364,7 @@
         const origin = link.closest('[data-page]')?.id;
         const returnName = origin === 'cloudlab' ? 'Cloud Lab' : (names[origin] || 'Portfolio');
         captureOrigin.textContent = returnName;
-        returnButton.textContent = 'Back to '+returnName;
+        returnButton.textContent = origin === 'about' ? 'Close' : 'Back to '+returnName;
         captureImage.src = capture.src;
         captureImage.alt = capture.title+'. '+capture.caption;
         captureTitle.textContent = capture.title;
