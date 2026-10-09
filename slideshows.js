@@ -25,11 +25,11 @@
     gallery.style.setProperty('--slide-duration', `${interval}ms`);
 
     let current = 0, timer = null, visible = false;
-    let paused = motion.matches || gallery.dataset.autoplay === 'false', hovered = false, focused = false;
+    let paused = gallery.dataset.autoplay === 'false', focused = false;
     let fullscreenFallback = false;
     const isFullscreen = () => document.fullscreenElement === gallery || fullscreenFallback;
     const canPlay = () => !motion.matches && !paused && !document.hidden && !gallery.closest('[hidden]') &&
-      (isFullscreen() || (visible && !hovered && !focused));
+      (isFullscreen() || (visible && !focused));
 
     const preloadNext = () => {
       const nextImage = new Image();
@@ -38,12 +38,12 @@
     const schedule = () => {
       clearTimeout(timer);
       timer = null;
-      if (gallery.closest('[data-walkthrough][hidden]')) paused = true;
       const playing = canPlay();
+      const showPlay = paused || motion.matches;
       gallery.dataset.playing = String(playing);
-      toggle.textContent = paused ? 'Play' : 'Pause';
-      toggle.setAttribute('aria-pressed', String(paused));
-      toggle.setAttribute('aria-label', `${paused ? 'Play' : 'Pause'} ${heading}`);
+      toggle.textContent = showPlay ? 'Play' : 'Pause';
+      toggle.setAttribute('aria-pressed', String(showPlay));
+      toggle.setAttribute('aria-label', `${showPlay ? 'Play' : 'Pause'} ${heading}`);
       toggle.disabled = motion.matches;
       state.textContent = motion.matches ? 'Manual view' : (paused ? 'Paused' : (playing ? 'Playing' : 'Ready'));
       progress.style.animation = 'none';
@@ -70,13 +70,11 @@
       if (manual) announcement.textContent = `${label}: ${slide.title}`;
     };
 
-    // AWS deployment and paper playback retain their existing autoplay behavior
-    // when opened. The EKS walkthrough still waits for an explicit Play action.
+    // All walkthroughs start automatically when visible, including after reopening.
     gallery.closest('[data-walkthrough]')?.addEventListener('walkthrough:toggle', event => {
       if (!event.detail.expanded) paused = true;
       else if (gallery.dataset.autoplay !== 'false' && !motion.matches) {
         paused = false;
-        hovered = false;
         focused = false;
       }
       schedule();
@@ -94,7 +92,7 @@
       if (motion.matches) return;
       paused = !paused;
       // An explicit Play action should start even while its button has focus.
-      if (!paused) { hovered = false; focused = false; }
+      if (!paused) focused = false;
       schedule();
     });
 
@@ -130,11 +128,11 @@
     });
     document.addEventListener('fullscreenchange', updateFullscreen);
     document.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && fullscreenFallback) exitFallback();
+      if (event.key !== 'Escape') return;
+      if (fullscreenFallback) exitFallback();
+      else if (document.fullscreenElement === gallery) document.exitFullscreen().catch(() => {});
     });
 
-    gallery.addEventListener('mouseenter', () => { hovered = true; schedule(); });
-    gallery.addEventListener('mouseleave', () => { hovered = false; schedule(); });
     gallery.addEventListener('focusin', () => { focused = true; schedule(); });
     gallery.addEventListener('focusout', () => {
       queueMicrotask(() => { focused = gallery.contains(document.activeElement); schedule(); });
@@ -170,7 +168,7 @@
       checkViewport();
     }
     document.addEventListener('visibilitychange', schedule);
-    motion.addEventListener('change', event => { if (event.matches) paused = true; schedule(); });
+    motion.addEventListener('change', schedule);
     render(0);
     schedule();
     controllers.push({schedule, exit: () => { if (fullscreenFallback) exitFallback(); }});

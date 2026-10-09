@@ -138,16 +138,12 @@
   // Decorative motion runs only while its target is visible. It does not represent a live deployment.
   const workflowVisual = document.querySelector('.workflow-visual');
   const workflowTrack = workflowVisual?.querySelector('.workflow-track');
-  const workflowToggle = workflowVisual?.querySelector('.workflow-motion-toggle');
   const attentionTargets = [workflowVisual, document.querySelector('.hero-ship-link')].filter(Boolean);
   const attentionMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const attentionVisible = new Map(attentionTargets.map(target => [target, false]));
-  let workflowPaused = false;
   const updateAttention = () => {
     attentionTargets.forEach(target => target.classList.toggle('is-motion-active',
-      !attentionMotion.matches && !document.hidden && attentionVisible.get(target) &&
-      (target !== workflowVisual || !workflowPaused)));
-    if (workflowToggle) workflowToggle.hidden = attentionMotion.matches;
+      !attentionMotion.matches && !document.hidden && attentionVisible.get(target)));
   };
   if ('IntersectionObserver' in window) {
     const attentionObserver = new IntersectionObserver(entries => {
@@ -160,13 +156,6 @@
   }
   document.addEventListener('visibilitychange', updateAttention);
   attentionMotion.addEventListener('change', updateAttention);
-  workflowToggle?.addEventListener('click', () => {
-    workflowPaused = !workflowPaused;
-    workflowToggle.setAttribute('aria-pressed', String(workflowPaused));
-    workflowToggle.setAttribute('aria-label', workflowPaused ? 'Resume workflow animation' : 'Pause workflow animation');
-    workflowToggle.textContent = workflowPaused ? 'Play animation' : 'Pause animation';
-    updateAttention();
-  });
   updateAttention();
 
   // Measure icon centers so the same connector works across the horizontal and mobile layouts.

@@ -775,19 +775,6 @@ body[data-page="cloudlab"] #main { max-width: 1440px; }
   0%, 20%, 100% { opacity: 0; }
   3%, 12% { opacity: .85; }
 }
-.workflow-motion-toggle {
-  padding: 7px 11px;
-  border: 1px solid #d1ded9;
-  border-radius: 8px;
-  background: #f3f8f5;
-  color: var(--navy);
-  font-size: .8rem;
-  font-weight: 750;
-  cursor: pointer;
-}
-.workflow-motion-toggle[hidden] { display: none; }
-.workflow-motion-toggle:hover { background: #e8f3ec; }
-.workflow-motion-toggle:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
 #delivery-pipeline { scroll-margin-top: 95px; }
 #delivery-pipeline:focus { outline: none; }
 @media (hover: none) { .workflow-view-hint { opacity: 1; } }
@@ -897,6 +884,23 @@ body[data-page="cloudlab"] #main { max-width: 1440px; }
   .hero-result-summary, .hero-workflow-action { max-width: none; }
 }
 @media (max-width: 340px) { .hero-result-summary { display: none; } }
+
+/* Keep every profile link in the first desktop view without changing page padding. */
+@media (min-width: 901px) {
+  .hero-workflow-action .about-socials { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .hero-workflow-action .social-profile { flex-direction: column; gap: 4px; padding: 7px 3px; font-size: .75rem; line-height: 1.35; }
+  .hero-portrait .portrait-frame { width: clamp(120px, calc(100vh - 590px), var(--hero-photo-max, 260px)); }
+  .hero-portrait .portrait-badge { width: 33%; min-width: 54px; max-width: 87px; }
+}
+@media (min-width: 1500px) { .hero-portrait { --hero-photo-max: 285px; } }
+@media (min-width: 1151px) and (max-width: 1250px) {
+  .hero-portrait .portrait-frame { width: clamp(120px, calc(100vh - 630px), 260px); }
+}
+@media (min-width: 901px) and (max-width: 1150px) {
+  .hero-photo-content { flex-direction: row; gap: 14px; }
+  .hero-portrait .portrait-frame { width: 130px; flex: none; }
+  .hero-portrait .hero-availability { max-width: none; font-size: .88rem; }
+}
 
 /* Explain which personal project the delivery steps belong to. */
 .workflow-heading { margin-bottom: 25px; }
