@@ -597,7 +597,7 @@ body { text-align: left; hyphens: none; word-break: normal; overflow-wrap: norma
 .profile-lab-card small.lab-capture-count { color: var(--muted); font-size: .82rem; margin-top: 5px; }
 
 .experience-timing { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 9px; }
-.current-role-badge {
+.experience-status-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -611,9 +611,7 @@ body { text-align: left; hyphens: none; word-break: normal; overflow-wrap: norma
   line-height: 1.5;
   white-space: nowrap;
 }
-.current-role-dot { position: relative; width: 7px; height: 7px; border-radius: 50%; background: #318761; flex: none; }
-.current-role-dot::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; background: #318761; opacity: .25; animation: current-role-pulse 3s ease-in-out infinite; }
-@keyframes current-role-pulse { 0%, 100% { opacity: .15; } 50% { opacity: .45; } }
+@keyframes availability-pulse { 0%, 100% { opacity: .15; } 50% { opacity: .45; } }
 .experience-points .experience-logo { width: 25px; height: 25px; margin-top: 2px; }
 .experience-point-copy { min-width: 0; }
 .experience-point-copy strong { display: block; color: var(--navy); font-size: 1rem; line-height: 1.45; margin-bottom: 6px; }
@@ -687,7 +685,7 @@ body[data-page="cloudlab"] #main { max-width: 1440px; }
 .hero-photo-content { display: flex; flex-direction: column; align-items: center; gap: 24px; width: 100%; }
 .hero-portrait .hero-availability { display: flex; align-items: flex-start; gap: 10px; max-width: 315px; text-align: left; font-size: .94rem; line-height: 1.6; font-weight: 750; }
 .availability-dot { position: relative; width: 8px; height: 8px; flex: 0 0 8px; margin-top: 8px; background: #318761; border-radius: 50%; }
-.availability-dot::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; background: #318761; animation: current-role-pulse 3.5s ease-in-out infinite; }
+.availability-dot::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; background: #318761; animation: availability-pulse 3.5s ease-in-out infinite; }
 .hero-results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; width: 100%; max-width: 390px; }
 .hero-result-card { min-width: 0; padding: 13px 10px; border: 1px solid #dae5e4; border-radius: 12px; background: #f9fcfb; }
 .hero-result-value { display: block; color: var(--navy); font-size: 1.02rem; line-height: 1.4; font-weight: 850; white-space: normal; font-variant-numeric: tabular-nums; margin-bottom: 5px; }
