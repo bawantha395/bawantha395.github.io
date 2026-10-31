@@ -973,3 +973,41 @@ body[data-page="cloudlab"] #main { max-width: 1440px; }
 @media(max-width:1150px) and (min-width:901px) { .terminal-body { padding:14px; font-size:.7rem; } .terminal-profile { grid-template-columns:95px minmax(0,1fr); gap:12px; } .terminal-facts div { grid-template-columns:57px minmax(0,1fr); gap:5px; } .pod-row { grid-template-columns:minmax(0,1fr) 35px 100px; gap:5px; } }
 @media(max-width:650px) { .hero-terminal { width:100%; } .terminal-body { padding:14px 12px 12px; font-size:.68rem; } .terminal-profile { grid-template-columns:92px minmax(0,1fr); gap:11px; } .hero-terminal .portrait-frame { width:92px; } .terminal-facts div { grid-template-columns:54px minmax(0,1fr); gap:4px; } .pod-row { grid-template-columns:minmax(0,1fr) 32px 96px; gap:4px; font-size:.63rem; } .pod-status { font-size:.59rem; padding:1px 5px; } .terminal-title { font-size:.68rem; } }
 @media(prefers-reduced-motion:reduce) { .terminal-prompt i { animation:none; } }
+
+/* Frosted-glass terminal: keep the original page layout and hero copy intact. */
+.terminal-window {
+  border: 1px solid rgba(255,255,255,.30) !important;
+  background: linear-gradient(135deg, rgba(255,255,255,.34), rgba(224,239,255,.17) 48%, rgba(255,255,255,.25)) !important;
+  box-shadow: 0 24px 80px rgba(44,91,158,.16), inset 0 1px 0 rgba(255,255,255,.58), inset 0 -1px 0 rgba(255,255,255,.16) !important;
+  -webkit-backdrop-filter: blur(38px) saturate(1.85) brightness(1.08) !important;
+  backdrop-filter: blur(38px) saturate(1.85) brightness(1.08) !important;
+  color: #102443 !important;
+}
+.terminal-titlebar { background: rgba(255,255,255,.22) !important; border-bottom-color: rgba(255,255,255,.30) !important; }
+.terminal-title { color: #102443 !important; }
+.terminal-live { color: #087b56 !important; font-size: .72rem !important; }
+.terminal-body { color: #142b4b !important; text-shadow: 0 1px 0 rgba(255,255,255,.2); }
+.terminal-command { color: #132b4c !important; }
+.terminal-command span,.terminal-prompt span { color: #07875e !important; }
+.terminal-facts dd { color: #183354 !important; }
+.terminal-facts dt { color: #07875e !important; }
+.terminal-facts .terminal-open { color: #087b56 !important; font-weight: 800; }
+.terminal-separator { background: rgba(255,255,255,.55) !important; }
+.hero-terminal .portrait-frame { padding: 0 !important; border: 0 !important; background: transparent !important; box-shadow: none !important; overflow: visible; }
+.hero-terminal .portrait-frame img { border: 0 !important; border-radius: 15px !important; box-shadow: 0 12px 30px rgba(30,68,120,.17) !important; }
+.node-table { display: grid; gap: 5px; min-width: 0; overflow-x: auto; color: #173252; font: .66rem/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; }
+.node-row { display: grid; grid-template-columns: 1.18fr .65fr .95fr .68fr 1fr 1fr; gap: 7px; min-width: 570px; white-space: nowrap; }
+.node-head { color: #087eae; font-weight: 800; }
+.node-ready { color: #07875e; font-weight: 800; }
+.terminal-prompt { color: #173252 !important; }
+@media(max-width:650px) { .node-table { font-size:.58rem; } }
+
+/* Slow ambient movement in the blurred Kubernetes workspace. */
+body::before { animation: kubernetes-drift 34s ease-in-out infinite alternate; will-change: transform, background-position; }
+@keyframes kubernetes-drift {
+  0% { background-position: 48% 48%; transform: scale(1.035) translate3d(-.25%,0,0); }
+  50% { background-position: 53% 51%; transform: scale(1.07) translate3d(.35%,-.25%,0); }
+  100% { background-position: 50% 54%; transform: scale(1.045) translate3d(-.2%,.25%,0); }
+}
+.flight-trail { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 30; pointer-events: none; }
+@media(prefers-reduced-motion:reduce) { body::before { animation: none !important; } .flight-trail { display:none; } }
