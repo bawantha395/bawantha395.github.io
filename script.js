@@ -457,3 +457,19 @@
   }
 
 })();
+
+// Soft pointer-following light on the blurred background; motion stays subtle and accessible.
+(() => {
+  const root = document.documentElement;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion || !window.matchMedia('(pointer: fine)').matches) return;
+  let frame = 0;
+  window.addEventListener('pointermove', (event) => {
+    if (frame) cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(() => {
+      root.style.setProperty('--pointer-x', `${(event.clientX / window.innerWidth) * 100}%`);
+      root.style.setProperty('--pointer-y', `${(event.clientY / window.innerHeight) * 100}%`);
+      frame = 0;
+    });
+  }, { passive: true });
+})();
