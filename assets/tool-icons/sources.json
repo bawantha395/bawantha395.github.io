@@ -270,5 +270,69 @@
     "source": "https://wso2.cachefly.net/wso2/sites/all/image_resources/logos/WSO2-Logo-Black.webp",
     "brandPage": "https://wso2.com/",
     "unchanged": true
+  },
+  {
+    "name": "cognito",
+    "source": "https://registry.npmjs.org/aws-icons/-/aws-icons-3.3.0.tgz (icons/architecture-service/AmazonCognito.svg, official AWS Architecture Icons)"
+  },
+  {
+    "name": "sagemaker",
+    "source": "https://registry.npmjs.org/aws-icons/-/aws-icons-3.3.0.tgz (icons/architecture-service/AmazonSageMakerAI.svg, official AWS Architecture Icons)"
+  },
+  {
+    "name": "bedrock",
+    "source": "https://registry.npmjs.org/aws-icons/-/aws-icons-3.3.0.tgz (icons/architecture-service/AmazonBedrock.svg, official AWS Architecture Icons)"
+  },
+  {
+    "name": "textract",
+    "source": "https://registry.npmjs.org/aws-icons/-/aws-icons-3.3.0.tgz (icons/architecture-service/AmazonTextract.svg, official AWS Architecture Icons)"
+  },
+  {
+    "name": "sqs",
+    "source": "https://registry.npmjs.org/aws-icons/-/aws-icons-3.3.0.tgz (icons/architecture-service/AmazonSimpleQueueService.svg, official AWS Architecture Icons)"
+  },
+  {
+    "name": "sns",
+    "source": "https://registry.npmjs.org/aws-icons/-/aws-icons-3.3.0.tgz (icons/architecture-service/AmazonSimpleNotificationService.svg, official AWS Architecture Icons)"
+  },
+  {
+    "name": "lambda",
+    "source": "https://registry.npmjs.org/aws-icons/-/aws-icons-3.3.0.tgz (icons/architecture-service/AWSLambda.svg, official AWS Architecture Icons)"
+  },
+  {
+    "name": "eventbridge",
+    "source": "https://registry.npmjs.org/aws-icons/-/aws-icons-3.3.0.tgz (icons/architecture-service/AmazonEventBridge.svg, official AWS Architecture Icons)"
+  },
+  {
+    "name": "elasticache",
+    "source": "https://registry.npmjs.org/aws-icons/-/aws-icons-3.3.0.tgz (icons/architecture-service/AmazonElastiCache.svg, official AWS Architecture Icons)"
+  },
+  {
+    "name": "cloudformation",
+    "source": "https://registry.npmjs.org/aws-icons/-/aws-icons-3.3.0.tgz (icons/architecture-service/AWSCloudFormation.svg, official AWS Architecture Icons)"
+  },
+  {
+    "name": "codebuild",
+    "source": "https://registry.npmjs.org/aws-icons/-/aws-icons-3.3.0.tgz (icons/architecture-service/AWSCodeBuild.svg, official AWS Architecture Icons)"
+  },
+  {
+    "name": "postgresql",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/postgresql/postgresql-original.svg"
+  },
+  {
+    "name": "redis",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/redis/redis-original.svg"
+  },
+  {
+    "name": "fastapi",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/fastapi/fastapi-original.svg"
+  },
+  {
+    "name": "typescript",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg"
+  },
+  {
+    "name": "vitejs",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/vitejs/vitejs-original.svg"
   }
 ]
