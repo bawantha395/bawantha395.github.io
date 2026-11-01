@@ -948,4 +948,11 @@ body[data-page="cloudlab"] #main { max-width: 1440px; }
   .project-demo { margin: 0 20px 20px; }
   .project-walkthrough-action .button + .button { margin: 10px 0 0 0; }
 }
+@media (min-width: 651px) {
+  .workflow-track-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .workflow-track-4:before { left: calc((100% - 3 * var(--workflow-gap)) / 8); right: calc((100% - 3 * var(--workflow-gap)) / 8); width: auto; }
+}
+@media (max-width: 650px) {
+  .workflow-track.workflow-track-4:before { top: 26px; bottom: 26px; left: 24px; right: auto; width: 2px; height: auto; }
+}
 @media print { .project-demo { display: none; } }
