@@ -39,9 +39,9 @@
       buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.filter === category)));
       groups.forEach(group => {group.hidden = category !== 'all' && group.dataset.filterCategory !== category;});
       if (announce) {
-        const selector = page.id === 'projects' ? '.project' : (page.id === 'cloudlab' ? '.lab-card' : '.article-row');
+        const selector = page.id === 'projects' ? '.project' : '.article-row';
         const count = groups.filter(group => !group.hidden).reduce((total, group) => total + group.querySelectorAll(selector).length, 0);
-        status.textContent = count + (page.id === 'projects' ? ' projects' : (page.id === 'cloudlab' ? ' exercises' : ' articles')) + ' shown.';
+        status.textContent = count + (page.id === 'projects' ? ' projects' : ' articles') + ' shown.';
       }
     };
     buttons.forEach(button => button.addEventListener('click', () => apply(button.dataset.filter, true)));
@@ -399,11 +399,9 @@
 
   // Cloud Lab captures open without leaving the current portfolio page.
   const captureDialog = document.getElementById('lab-evidence-viewer');
-  const captureSets = {};
-  document.querySelectorAll('[data-slideshow] .slideshow-data').forEach(source => {
-    try { captureSets[source.closest('[data-slideshow]').dataset.slideshow] = JSON.parse(source.textContent); } catch { /* ignore unreadable data */ }
-  });
-  if (captureDialog && Object.keys(captureSets).length) {
+  const captureSource = document.querySelector('[data-slideshow="eks"] .slideshow-data');
+  if (captureDialog && captureSource) {
+    const captures = JSON.parse(captureSource.textContent);
     const captureImage = document.getElementById('lab-evidence-image');
     const captureTitle = document.getElementById('lab-evidence-title');
     const captureCaption = document.getElementById('lab-evidence-caption');
@@ -415,7 +413,7 @@
       link.addEventListener('click', event => {
         if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
         if (typeof captureDialog.showModal !== 'function') return;
-        const capture = (captureSets[link.dataset.evidenceSet || 'eks'] || [])[Number(link.dataset.evidence)];
+        const capture = captures[Number(link.dataset.evidence)];
         if (!capture) return;
         event.preventDefault();
         captureOpener = link;
@@ -456,135 +454,6 @@
     window.addEventListener('popstate', () => {
       if (captureDialog.open && window.history.state?.portfolioCapture !== captureHistoryKey) captureDialog.close();
     });
-  }
-
-  // Project demo videos open inside the project card. Closing removes the player so playback stops.
-  document.querySelectorAll('[data-demo-toggle]').forEach(button => {
-    const panel = document.getElementById(button.getAttribute('aria-controls'));
-    if (!panel) return;
-    button.addEventListener('click', () => {
-      const open = button.getAttribute('aria-expanded') !== 'true';
-      const frame = panel.querySelector('.demo-frame');
-      button.setAttribute('aria-expanded', String(open));
-      button.textContent = open ? 'Hide the demo' : 'Watch the demo';
-      panel.hidden = !open;
-      if (frame) {
-        frame.textContent = '';
-        if (open) {
-          const player = document.createElement('iframe');
-          player.src = panel.dataset.demoSrc;
-          player.title = panel.dataset.demoTitle || 'Project demo video';
-          player.allow = 'autoplay; fullscreen';
-          player.allowFullscreen = true;
-          frame.append(player);
-        }
-      }
-      status.textContent = open ? 'Demo video opened.' : 'Demo video closed.';
-    });
-  });
-
-  const resourceDrawer = document.getElementById('resource-drawer');
-  const resourceContent = document.getElementById('resource-drawer-content');
-  const resourceTitle = document.getElementById('resource-drawer-title');
-  const resourceLink = resourceDrawer?.querySelector('.drawer-link');
-  const resources = {
-    about: {title:'portfolio-about', summary:'Identity and profile service', details:[['Role','Cloud & DevOps Engineer'],['Location','Sri Lanka'],['Status','Open to opportunities']], target:'#about'},
-    experience: {title:'mitra-ai-devops', summary:'Enterprise deployment history service', details:[['Environment','Sampath Bank staging'],['Platform','VMware Tanzu Kubernetes'],['Focus','Release validation and troubleshooting']], target:'#experience'},
-    'stocklane-project': {title:'stocklane-platform', summary:'AWS EKS + GitOps workload', details:[['Runtime','Amazon EKS'],['Delivery','GitHub Actions + Argo CD'],['Infrastructure','Terraform, Prometheus and Grafana']], target:'#projects'},
-    cloudlab: {title:'eks-gitops-lab', summary:'Hands-on learning workloads', details:[['Exercises','12 recorded experiments'],['Topics','Infrastructure, delivery, monitoring and AI operations'],['Evidence','Screenshots and architecture records']], target:'#cloudlab'},
-    skills: {title:'observability-stack', summary:'Skills and technology registry', details:[['Delivery','GitHub Actions, Jenkins and Argo CD'],['Platform','AWS, Docker, Kubernetes and Tanzu'],['Monitoring','Prometheus, Grafana, Loki and CloudWatch']], target:'#skills'}
-  };
-  const openResource = key => {
-    const resource = resources[key];
-    if (!resource || !resourceDrawer || !resourceContent) return;
-    resourceTitle.textContent = resource.title;
-    resourceContent.innerHTML = `<p>${resource.summary}</p><div class="drawer-detail-grid">${resource.details.map(([label,value]) => `<div class="drawer-detail"><small>${label}</small><strong>${value}</strong></div>`).join('')}</div>`;
-    resourceLink.href = resource.target;
-    resourceDrawer.showModal();
-  };
-  document.querySelectorAll('[data-resource]').forEach(button => button.addEventListener('click', () => openResource(button.dataset.resource)));
-  resourceDrawer?.querySelector('.drawer-close').addEventListener('click', () => resourceDrawer.close());
-  resourceDrawer?.addEventListener('click', event => { if (event.target === resourceDrawer) resourceDrawer.close(); });
-
-  const deployDialog = document.getElementById('deploy-dialog');
-  const deployResult = deployDialog?.querySelector('.deploy-result');
-  let deployTimer;
-  const startDeployment = () => {
-    if (!deployDialog) return;
-    clearInterval(deployTimer);
-    deployDialog.querySelectorAll('[data-deploy-step]').forEach(step => { step.classList.remove('is-running','is-done'); step.querySelector('b').textContent = 'Waiting'; });
-    deployResult.textContent = '';
-    deployDialog.showModal();
-    let current = 0;
-    deployTimer = window.setInterval(() => {
-      const step = deployDialog.querySelector(`[data-deploy-step="${current}"]`);
-      if (step) { step.classList.add('is-done'); step.querySelector('b').textContent = 'Complete'; }
-      current += 1;
-      const next = deployDialog.querySelector(`[data-deploy-step="${current}"]`);
-      if (next) { next.classList.add('is-running'); next.querySelector('b').textContent = 'Running'; }
-      else { clearInterval(deployTimer); deployResult.textContent = 'Deployment successful · namespace/portfolio is ready.'; }
-    }, 650);
-  };
-  document.querySelector('.deploy-trigger')?.addEventListener('click', startDeployment);
-  deployDialog?.querySelector('.deploy-close').addEventListener('click', () => { clearInterval(deployTimer); deployDialog.close(); });
-  deployDialog?.addEventListener('click', event => { if (event.target === deployDialog) { clearInterval(deployTimer); deployDialog.close(); } });
-
-  const modeToggle = document.querySelector('.cluster-mode-toggle');
-  modeToggle?.addEventListener('click', () => {
-    const engineerMode = document.body.classList.toggle('engineer-mode');
-    modeToggle.setAttribute('aria-pressed', String(engineerMode));
-    modeToggle.querySelector('span').textContent = engineerMode ? 'Recruiter mode' : 'Engineer mode';
-    status.textContent = engineerMode ? 'Engineer mode enabled. Technical details expanded.' : 'Recruiter mode enabled.';
-  });
-
-  const palette = document.querySelector('.command-palette');
-  const commandInput = document.getElementById('command-input');
-  const commandResults = document.querySelector('.command-results');
-  const commandItems = [
-    ['Open cluster overview','about'],['Open deployment history','experience'],['Inspect Stocklane workload','stocklane-project'],['Open pod explorer','cloudlab'],['View cluster capabilities','skills'],['Deploy portfolio simulation','deploy']
-  ];
-  const renderCommands = query => {
-    if (!commandResults) return;
-    const matches = commandItems.filter(([label]) => label.toLowerCase().includes(query.toLowerCase()));
-    commandResults.innerHTML = matches.map(([label,key]) => `<li><button type="button" data-command="${key}"><strong>${label}</strong><small>Open resource</small></button></li>`).join('');
-    commandResults.querySelectorAll('[data-command]').forEach(button => button.addEventListener('click', () => {
-      palette.hidden = true;
-      if (button.dataset.command === 'deploy') startDeployment(); else openResource(button.dataset.command);
-    }));
-  };
-  const openPalette = () => { if (!palette) return; palette.hidden = false; renderCommands(''); commandInput?.focus(); };
-  const closePalette = () => { if (palette) palette.hidden = true; };
-  commandInput?.addEventListener('input', () => renderCommands(commandInput.value));
-  palette?.addEventListener('click', event => { if (event.target === palette) closePalette(); });
-  document.addEventListener('keydown', event => {
-    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); openPalette(); }
-    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'e') { event.preventDefault(); modeToggle?.click(); }
-    if (event.key === 'Escape') closePalette();
-  });
-
-  // A quiet Argo CD trail reinforces the delivery theme without replacing the native cursor.
-  const pointerQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
-  const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-  if (pointerQuery.matches && !reducedMotionQuery.matches) {
-    const pointerIcon = document.createElement('img');
-    pointerIcon.src = 'assets/tool-icons/argocd.svg';
-    pointerIcon.alt = '';
-    pointerIcon.className = 'argocd-pointer';
-    pointerIcon.setAttribute('aria-hidden', 'true');
-    document.body.append(pointerIcon);
-    let pointerX = -40, pointerY = -40, targetX = pointerX, targetY = pointerY, pointerFrame = 0;
-    const renderPointer = () => {
-      pointerX += (targetX - pointerX) * .18;
-      pointerY += (targetY - pointerY) * .18;
-      pointerIcon.style.transform = `translate3d(${pointerX}px,${pointerY}px,0)`;
-      pointerFrame = Math.abs(targetX - pointerX) + Math.abs(targetY - pointerY) > .5
-        ? window.requestAnimationFrame(renderPointer) : 0;
-    };
-    window.addEventListener('pointermove', event => {
-      targetX = event.clientX + 14;
-      targetY = event.clientY + 14;
-      if (!pointerFrame) pointerFrame = window.requestAnimationFrame(renderPointer);
-    }, {passive:true});
   }
 
 })();
