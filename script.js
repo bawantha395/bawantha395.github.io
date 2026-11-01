@@ -483,4 +483,29 @@
     });
   });
 
+  // A quiet Argo CD trail reinforces the delivery theme without replacing the native cursor.
+  const pointerQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (pointerQuery.matches && !reducedMotionQuery.matches) {
+    const pointerIcon = document.createElement('img');
+    pointerIcon.src = 'assets/tool-icons/argocd.svg';
+    pointerIcon.alt = '';
+    pointerIcon.className = 'argocd-pointer';
+    pointerIcon.setAttribute('aria-hidden', 'true');
+    document.body.append(pointerIcon);
+    let pointerX = -40, pointerY = -40, targetX = pointerX, targetY = pointerY, pointerFrame = 0;
+    const renderPointer = () => {
+      pointerX += (targetX - pointerX) * .18;
+      pointerY += (targetY - pointerY) * .18;
+      pointerIcon.style.transform = `translate3d(${pointerX}px,${pointerY}px,0)`;
+      pointerFrame = Math.abs(targetX - pointerX) + Math.abs(targetY - pointerY) > .5
+        ? window.requestAnimationFrame(renderPointer) : 0;
+    };
+    window.addEventListener('pointermove', event => {
+      targetX = event.clientX + 14;
+      targetY = event.clientY + 14;
+      if (!pointerFrame) pointerFrame = window.requestAnimationFrame(renderPointer);
+    }, {passive:true});
+  }
+
 })();

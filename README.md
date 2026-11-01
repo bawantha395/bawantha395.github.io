@@ -24,3 +24,9 @@ The lead case study is **Stocklane**, a workshop stock-management platform that 
 - `assets/` contains project diagrams, screenshots, PDFs, fonts and technology icons.
 
 The site has no build step or runtime dependencies and can be deployed directly as a static GitHub Pages site.
+
+## Visual experience
+
+The landing view uses a bright, transparent glassmorphism workspace designed to explain the portfolio to both technical and non-technical visitors. The MacBook-style hero is a conceptual local cloud lab: the terminal and technology icons illustrate the relationship between a laptop, Kubernetes, GitOps and observability without claiming live cluster telemetry.
+
+Technical depth is progressively disclosed through the existing Projects, Cloud Lab, Skills and experience sections. Decorative motion respects reduced-motion preferences, and the Argo CD pointer companion is enabled only for desktop fine-pointer devices.
