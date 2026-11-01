@@ -27,6 +27,8 @@ The site has no build step or runtime dependencies and can be deployed directly 
 
 ## Visual experience
 
-The landing view uses a bright, transparent glassmorphism workspace designed to explain the portfolio to both technical and non-technical visitors. The MacBook-style hero is a conceptual local cloud lab: the terminal and technology icons illustrate the relationship between a laptop, Kubernetes, GitOps and observability without claiming live cluster telemetry.
+The portfolio uses a dark operator-style interface inspired by modern SRE and cloud-native tools: quiet graphite surfaces, mono labels, generous typography, green health accents and a compact MacBook/Kubernetes runtime context. The design is intentionally story-first rather than a literal fake dashboard, so recruiters understand the person and outcomes before opening technical evidence.
 
-Technical depth is progressively disclosed through the existing Projects, Cloud Lab, Skills and experience sections. Decorative motion respects reduced-motion preferences, and the Argo CD pointer companion is enabled only for desktop fine-pointer devices.
+The MacBook terminal and Kubernetes language are conceptual visual framing only; they do not claim live cluster telemetry. Technical depth is progressively disclosed through the existing Projects, Cloud Lab, Skills and experience sections. Decorative motion respects reduced-motion preferences, and the Argo CD pointer companion is enabled only for desktop fine-pointer devices.
+
+The shell also includes an optional Engineer mode, a `⌘ K` resource palette, workload inspectors and a clearly-labelled portfolio deployment simulation. These are local interface interactions and never connect to external infrastructure.
