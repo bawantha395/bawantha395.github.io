@@ -20,3 +20,8 @@ See Devicon-LICENSE.txt and sources.json for exact provenance.
 
 WSO2: official WSO2 black logo, used to identify WSO2 API Manager.
 https://wso2.com/
+
+Added for the Stocklane project: AWS service icons (Cognito, SageMaker, Bedrock, Textract, SQS, SNS,
+Lambda, EventBridge, ElastiCache, CloudFormation, CodeBuild) come from the aws-icons npm package 3.3.0,
+which redistributes the official AWS Architecture Icons unmodified. PostgreSQL, Redis, FastAPI,
+TypeScript and Vite are original-colour Devicon assets. See sources.json for exact provenance.

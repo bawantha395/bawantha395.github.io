@@ -39,9 +39,9 @@
       buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.filter === category)));
       groups.forEach(group => {group.hidden = category !== 'all' && group.dataset.filterCategory !== category;});
       if (announce) {
-        const selector = page.id === 'projects' ? '.project' : '.article-row';
+        const selector = page.id === 'projects' ? '.project' : (page.id === 'cloudlab' ? '.lab-card' : '.article-row');
         const count = groups.filter(group => !group.hidden).reduce((total, group) => total + group.querySelectorAll(selector).length, 0);
-        status.textContent = count + (page.id === 'projects' ? ' projects' : ' articles') + ' shown.';
+        status.textContent = count + (page.id === 'projects' ? ' projects' : (page.id === 'cloudlab' ? ' exercises' : ' articles')) + ' shown.';
       }
     };
     buttons.forEach(button => button.addEventListener('click', () => apply(button.dataset.filter, true)));
@@ -399,9 +399,11 @@
 
   // Cloud Lab captures open without leaving the current portfolio page.
   const captureDialog = document.getElementById('lab-evidence-viewer');
-  const captureSource = document.querySelector('[data-slideshow="eks"] .slideshow-data');
-  if (captureDialog && captureSource) {
-    const captures = JSON.parse(captureSource.textContent);
+  const captureSets = {};
+  document.querySelectorAll('[data-slideshow] .slideshow-data').forEach(source => {
+    try { captureSets[source.closest('[data-slideshow]').dataset.slideshow] = JSON.parse(source.textContent); } catch { /* ignore unreadable data */ }
+  });
+  if (captureDialog && Object.keys(captureSets).length) {
     const captureImage = document.getElementById('lab-evidence-image');
     const captureTitle = document.getElementById('lab-evidence-title');
     const captureCaption = document.getElementById('lab-evidence-caption');
@@ -413,7 +415,7 @@
       link.addEventListener('click', event => {
         if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
         if (typeof captureDialog.showModal !== 'function') return;
-        const capture = captures[Number(link.dataset.evidence)];
+        const capture = (captureSets[link.dataset.evidenceSet || 'eks'] || [])[Number(link.dataset.evidence)];
         if (!capture) return;
         event.preventDefault();
         captureOpener = link;
@@ -455,5 +457,30 @@
       if (captureDialog.open && window.history.state?.portfolioCapture !== captureHistoryKey) captureDialog.close();
     });
   }
+
+  // Project demo videos open inside the project card. Closing removes the player so playback stops.
+  document.querySelectorAll('[data-demo-toggle]').forEach(button => {
+    const panel = document.getElementById(button.getAttribute('aria-controls'));
+    if (!panel) return;
+    button.addEventListener('click', () => {
+      const open = button.getAttribute('aria-expanded') !== 'true';
+      const frame = panel.querySelector('.demo-frame');
+      button.setAttribute('aria-expanded', String(open));
+      button.textContent = open ? 'Hide the demo' : 'Watch the demo';
+      panel.hidden = !open;
+      if (frame) {
+        frame.textContent = '';
+        if (open) {
+          const player = document.createElement('iframe');
+          player.src = panel.dataset.demoSrc;
+          player.title = panel.dataset.demoTitle || 'Project demo video';
+          player.allow = 'autoplay; fullscreen';
+          player.allowFullscreen = true;
+          frame.append(player);
+        }
+      }
+      status.textContent = open ? 'Demo video opened.' : 'Demo video closed.';
+    });
+  });
 
 })();
