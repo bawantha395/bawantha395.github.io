@@ -119,7 +119,7 @@
   reduce.addEventListener('change', () => { document.body.classList.remove('fx-cursor-on'); kick(); });
 
   /* ------------------------------------------------------------ terminal helpers */
-  const P = (cmd) => `<span class="t-p">bawantha@macbook</span> <span class="t-path">~</span> % <span class="t-cmd">${esc(cmd)}</span>`;
+  const P = (cmd) => `<span class="t-p">bawantha@macbook</span> <span class="t-path">~/portfolio</span> % <span class="t-cmd">${esc(cmd)}</span>`;
   const bar = title => `<div class="term-bar"><i class="r"></i><i class="y"></i><i class="g"></i><span class="term-title">${esc(title)}</span>${title.indexOf('zsh') > -1 ? '<button class="term-replay" type="button" aria-label="Replay the terminal demo">↻ replay</button>' : ''}</div>`;
   const pad = (s, n) => String(s).padEnd(n, ' ');
   const status = s => ({Running: 't-ok', Completed: 't-ok', Ready: 't-ok', ContainerCreating: 't-warn', Pending: 't-warn', Terminating: 't-dim', Synced: 't-ok', Healthy: 't-ok'}[s] || '');
@@ -128,13 +128,19 @@
   const hero = document.getElementById('hero-term');
   if (hero) {
     hero.innerHTML = bar('bawantha@macbook — zsh') + '<div class="term-body" tabindex="0" role="log" aria-label="Terminal output, simulated Kubernetes cluster"></div>' +
-      '<div class="term-chips" aria-label="Try a command"></div><div class="term-cap">Simulated cluster, modelled on my Stocklane setup. Type a command or tap one.</div>';
+      '<div class="term-chips" aria-label="Try a command"></div><div class="term-cap">Simulated terminal and cluster, modelled on my Stocklane setup. Type a command or tap one.</div>';
     const body = hero.querySelector('.term-body'), chips = hero.querySelector('.term-chips');
     let skip = false, busy = false, engaged = false, history = [], hIdx = 0;
     const sleep = ms => skip ? Promise.resolve() : sleepRaw(ms);
     const scroll = () => { body.scrollTop = body.scrollHeight; };
     const line = html => { const d = document.createElement('div'); d.className = 'term-line'; d.innerHTML = html; body.appendChild(d); scroll(); return d; };
     const gen = () => Math.random().toString(36).slice(2, 7);
+    const photoNode = document.querySelector('.hero-photo-content');
+    const aboutRows = [['certified-kubernetes-administrator', '0/1', 'ContainerCreating', '#certifications'], ['claude-certified-architect-foundations', '1/1', 'Running', '#certifications'],
+      ['aws-solutions-architect-associate', '1/1', 'Completed', '#certifications'], ['stocklane-eks-gitops-mlops-llmops', '1/1', 'Completed', '#projects'],
+      ['issue-tracker-eks-gitops', '1/1', 'Completed', '#projects'], ['issue-tracker-jenkins-cicd', '1/1', 'Completed', '#projects']];
+    const gitLog = [['a3f9c21', '<span class="t-info">(HEAD -&gt; main, tag: open-to-work)</span> Built Stocklane on AWS EKS'], ['7d21b8e', 'Completed the DevOps internship at Mitra AI'],
+      ['c40e5a9', 'Passed AWS Certified Solutions Architect Associate'], ['91b6f3d', 'Built the Issue Tracker platform on EKS with Argo CD'], ['5be02c1', 'Joined Mitra AI as a DevOps intern'], ['e2c7a04', 'Joined PickMe as an SDET intern']];
 
     // ----- model
     const baseName = 'inventory-6f9c7d-';
@@ -167,8 +173,8 @@
     // ----- commands
     const table = (head, rows) => { line(`<span class="t-hd">${head}</span>`); rows.forEach(r => line(r)); };
     const help = () => {
-      ['Commands you can try:', '  kubectl get nodes | pods | deployments | hpa', '  kubectl scale deploy/inventory --replicas=5', '  kubectl delete pod <pod-name>',
-        '  argocd app list', '  whoami   ls   open projects   clear   help'].forEach((t, i) => line(i ? `<span class="t-info">${esc(t)}</span>` : esc(t)));
+      ['Commands you can try', '  whoami   git log --oneline', '  kubectl get pods -n about   (click a row to open it)', '  kubectl get nodes | pods -n stocklane | deployments | hpa', '  kubectl scale deploy/inventory --replicas=5',
+        '  kubectl delete pod &lt;pod-name&gt;', '  argocd app list', '  ls   open projects   clear   help'].forEach((t, i) => line(i ? `<span class="t-info">${esc(t)}</span>` : esc(t)));
     };
     const pages = ['about', 'experience', 'projects', 'cloudlab', 'skills', 'certifications', 'blog', 'contact'];
     const runCore = async raw => {
@@ -177,7 +183,13 @@
       const a = cmd.split(' ');
       if (cmd === 'clear') { body.innerHTML = ''; return; }
       if (cmd === 'help') return help();
-      if (cmd === 'whoami') { line('Bawantha Rathnayake'); line('Cloud &amp; DevOps Engineer · AWS Certified · Colombo, Sri Lanka'); line('<span class="t-ok">Open to Cloud / DevOps roles</span>'); return; }
+      if (cmd === 'whoami') {
+        const d = line(''); d.classList.add('term-whoami');
+        d.innerHTML = '<div class="term-photo"></div><div class="term-who"><span class="t-ok term-name">Bawantha Rathnayake</span><br>Cloud &amp; DevOps Engineer · AWS Certified<br>BSc (Hons) Computer Engineering<br>University of Ruhuna · Colombo, Sri Lanka<br><span class="t-ok">Open to Cloud / DevOps roles</span></div>';
+        if (photoNode) d.querySelector('.term-photo').appendChild(photoNode);
+        scroll(); return;
+      }
+      if (cmd === 'git log --oneline' || cmd === 'git log') { gitLog.forEach(r => line(`<span class="t-warn">${r[0]}</span> ${r[1]}`)); return; }
       if (cmd === 'ls') { line('about  experience  projects  cloudlab  skills  certifications  articles  contact'); return; }
       if (a[0] === 'open') { const t = (a[1] || '').replace('articles', 'blog').replace('lab', 'cloudlab').replace('cloudcloudlab', 'cloudlab'); if (pages.includes(t)) { line(`<span class="t-dim">opening ${esc(a[1])}…</span>`); setTimeout(() => { location.hash = '#' + t; }, 350); } else line(`<span class="t-err">open: no such page: ${esc(a[1] || '')}</span>`); return; }
       if (a[0] === 'argocd' && a[1] === 'app' && a[2] === 'list') {
@@ -188,6 +200,13 @@
       const verb = a[1], what = a[2] || '';
       if (verb === 'get') {
         if (/^nodes?$/.test(what)) { table(pad('NAME', 20) + pad('STATUS', 8) + pad('ROLES', 8) + pad('AGE', 5) + 'VERSION', [['ip-10-42-10-21', 'Ready'], ['ip-10-42-11-47', 'Ready']].map(r => `${pad(r[0], 20)}<span class="t-ok">${pad(r[1], 8)}</span>${pad('<none>', 8).replace('<','&lt;').replace('>','&gt;')}${pad('2d', 5)}v1.31`)); return; }
+        const ns = (cmd.match(/(?:-n|--namespace)[ =](\S+)/) || [])[1] || 'stocklane';
+        if (/^pods?$/.test(what) && ns === 'about') {
+          line(`<span class="t-hd">${pad('NAME', 42)}${pad('READY', 7)}STATUS</span>`);
+          aboutRows.forEach(r => line(`<a class="term-link" href="${r[3]}">${pad(r[0], 42)}${pad(r[1], 7)}<span class="${status(r[2])}">${r[2]}</span></a>`));
+          return;
+        }
+        if (/^pods?$/.test(what) && ns !== 'stocklane') { line(`No resources found in ${esc(ns)} namespace.`); return; }
         if (/^pods?$/.test(what)) {
           line(`<span class="t-hd">${pad('NAME', 30)}${pad('READY', 8)}${pad('STATUS', 19)}AGE</span>`);
           pods.forEach(p => { const r = line(rowHtml(p)); p.rows.push(r); });
@@ -234,7 +253,7 @@
           await run(v); newPrompt();
         } else if (e.key === 'ArrowUp') { e.preventDefault(); if (hIdx > 0) inputEl.value = history[--hIdx]; }
         else if (e.key === 'ArrowDown') { e.preventDefault(); inputEl.value = hIdx < history.length - 1 ? history[++hIdx] : (hIdx = history.length, ''); }
-        else if (e.key === 'Tab') { e.preventDefault(); const opts = ['kubectl get nodes', 'kubectl get pods', 'kubectl get deployments', 'kubectl get hpa', 'kubectl scale deploy/inventory --replicas=5', 'argocd app list', 'whoami', 'help', 'clear', 'open projects']; const m = opts.find(o => o.startsWith(inputEl.value) && o !== inputEl.value); if (m) inputEl.value = m; }
+        else if (e.key === 'Tab') { e.preventDefault(); const opts = ['whoami', 'git log --oneline', 'kubectl get pods -n about', 'kubectl get pods', 'kubectl get nodes', 'kubectl get deployments', 'kubectl get hpa', 'kubectl scale deploy/inventory --replicas=5', 'argocd app list', 'whoami', 'help', 'clear', 'open projects']; const m = opts.find(o => o.startsWith(inputEl.value) && o !== inputEl.value); if (m) inputEl.value = m; }
         else if (e.ctrlKey && e.key.toLowerCase() === 'l') { e.preventDefault(); body.innerHTML = ''; newPrompt(); }
       });
       inputEl.addEventListener('focus', () => { skip = true; engaged = true; });
@@ -252,7 +271,7 @@
     };
     const demo = async () => {
       busy = true; skip = false; resetPods(); body.innerHTML = '';
-      const steps = ['kubectl get nodes', 'kubectl scale deploy/inventory --replicas=5', 'kubectl get pods'];
+      const steps = ['whoami', 'git log --oneline', 'kubectl get pods -n about'];
       for (const c of steps) { await sleep(420); await typeCmd(c); await run(c); }
       await sleep(250); busy = false; newPrompt();
     };
@@ -260,7 +279,7 @@
     body.addEventListener('pointerdown', () => { skip = true; engaged = true; });
     body.addEventListener('click', () => { const sel = window.getSelection(); if (inputEl && !inputEl.disabled && (!sel || sel.isCollapsed)) inputEl.focus({preventScroll: true}); });
     hero.querySelector('.term-replay').addEventListener('click', () => { skip = true; setTimeout(demo, 60); });
-    [['Nodes', 'kubectl get nodes'], ['Pods', 'kubectl get pods'], ['Scale to 5', 'kubectl scale deploy/inventory --replicas=5'], ['Argo CD apps', 'argocd app list'], ['Who am I', 'whoami'], ['Help', 'help']].forEach(([label, c]) => {
+    [['Who am I', 'whoami'], ['Career', 'git log --oneline'], ['Certs and projects', 'kubectl get pods -n about'], ['Cluster', 'kubectl get pods -n stocklane'], ['Scale to 5', 'kubectl scale deploy/inventory --replicas=5'], ['Argo CD', 'argocd app list'], ['Help', 'help']].forEach(([label, c]) => {
       const b = document.createElement('button'); b.type = 'button'; b.textContent = label; b.title = c; chips.appendChild(b);
       b.addEventListener('click', async () => { if (busy) return; skip = true; engaged = true; if (inputEl) { inputEl.disabled = true; inputEl.closest('.term-line').remove(); } await typeCmd(c); await run(c); newPrompt(); });
     });
@@ -301,7 +320,7 @@
       `  <span class="t-ok">SuccessfulRescale</span>  New size: 5; reason: cpu resource utilization above target`
     ],
     skills: [
-      '<span class="t-dim"># The tools I use across cloud, delivery, observability, security and AI.</span>',
+      '<span class="t-dim"># Click any skill below to see where I used it.</span>',
       P('kubectl get configmap skills -o yaml'),
       'data:',
       ...[['cloud', 'AWS, Terraform, CloudFormation, VPC, EKS, ECR, ALB, CloudFront'], ['containers', 'Docker, Kubernetes, VMware Tanzu, Helm, Kustomize'], ['delivery', 'Jenkins, GitHub Actions, Argo CD, AWS CodeBuild, Trivy'],
