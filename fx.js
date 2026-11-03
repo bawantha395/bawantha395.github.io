@@ -120,171 +120,63 @@
 
   /* ------------------------------------------------------------ terminal helpers */
   const P = (cmd) => `<span class="t-p">bawantha@macbook</span> <span class="t-path">~/portfolio</span> % <span class="t-cmd">${esc(cmd)}</span>`;
-  const bar = title => `<div class="term-bar"><i class="r"></i><i class="y"></i><i class="g"></i><span class="term-title">${esc(title)}</span>${title.indexOf('zsh') > -1 ? '<button class="term-replay" type="button" aria-label="Replay the terminal demo">↻ replay</button>' : ''}</div>`;
+  const bar = title => `<div class="term-bar"><i class="r"></i><i class="y"></i><i class="g"></i><span class="term-title">${esc(title)}</span></div>`;
   const pad = (s, n) => String(s).padEnd(n, ' ');
   const status = s => ({Running: 't-ok', Completed: 't-ok', Ready: 't-ok', ContainerCreating: 't-warn', Pending: 't-warn', Terminating: 't-dim', Synced: 't-ok', Healthy: 't-ok'}[s] || '');
 
-  /* ------------------------------------------------------------ hero terminal (simulated cluster) */
+  /* ------------------------------------------------------------ hero terminal: types itself, then loops one line */
   const hero = document.getElementById('hero-term');
   if (hero) {
-    hero.innerHTML = bar('bawantha@macbook — zsh') + '<div class="term-body" tabindex="0" role="log" aria-label="Terminal output, simulated Kubernetes cluster"></div>' +
-      '<div class="term-chips" aria-label="Try a command"></div><div class="term-cap">Simulated terminal and cluster, modelled on my Stocklane setup. Type a command or tap one.</div>';
-    const body = hero.querySelector('.term-body'), chips = hero.querySelector('.term-chips');
-    let skip = false, busy = false, engaged = false, history = [], hIdx = 0;
-    const sleep = ms => skip ? Promise.resolve() : sleepRaw(ms);
-    const scroll = () => { body.scrollTop = body.scrollHeight; };
-    const line = html => { const d = document.createElement('div'); d.className = 'term-line'; d.innerHTML = html; body.appendChild(d); scroll(); return d; };
-    const gen = () => Math.random().toString(36).slice(2, 7);
+    hero.innerHTML = bar('bawantha@macbook — zsh') + '<div class="term-body" role="log" aria-label="Terminal output"></div>';
+    const body = hero.querySelector('.term-body');
     const photoNode = document.querySelector('.hero-photo-content');
-    const aboutRows = [['certified-kubernetes-administrator', '0/1', 'ContainerCreating', '#certifications'], ['claude-certified-architect-foundations', '1/1', 'Running', '#certifications'],
-      ['aws-solutions-architect-associate', '1/1', 'Completed', '#certifications'], ['stocklane-eks-gitops-mlops-llmops', '1/1', 'Completed', '#projects'],
-      ['issue-tracker-eks-gitops', '1/1', 'Completed', '#projects'], ['issue-tracker-jenkins-cicd', '1/1', 'Completed', '#projects']];
-    const gitLog = [['a3f9c21', '<span class="t-info">(HEAD -&gt; main, tag: open-to-work)</span> Built Stocklane on AWS EKS'], ['7d21b8e', 'Completed the DevOps internship at Mitra AI'],
-      ['c40e5a9', 'Passed AWS Certified Solutions Architect Associate'], ['91b6f3d', 'Built the Issue Tracker platform on EKS with Argo CD'], ['5be02c1', 'Joined Mitra AI as a DevOps intern'], ['e2c7a04', 'Joined PickMe as an SDET intern']];
-
-    // ----- model
-    const baseName = 'inventory-6f9c7d-';
-    let pods;
-    const resetPods = () => {
-      pods = [
-        {n: baseName + '4kx2p', app: 'inventory', ready: '1/1', st: 'Running', age: '2d', rows: []},
-        {n: 'workshop-7b84d5-hx9vl', app: 'workshop', ready: '1/1', st: 'Running', age: '2d', rows: []},
-        {n: 'vision-5c6f88-q3t7r', app: 'vision', ready: '1/1', st: 'Running', age: '2d', rows: []},
-        {n: 'forecast-84d9b6-z6j4k', app: 'forecast', ready: '1/1', st: 'Running', age: '2d', rows: []}
-      ];
-    };
-    resetPods();
-    const live = () => pods.filter(p => p.st !== 'Terminating');
-    const invCount = () => pods.filter(p => p.app === 'inventory' && p.st !== 'Terminating').length;
-    const rowHtml = p => `${pad(p.n, 30)}${pad(p.ready, 8)}<span class="${status(p.st)}">${pad(p.st, 19)}</span>${p.age}`;
-    const refresh = p => p.rows.forEach(r => { r.innerHTML = rowHtml(p); });
-    const progress = p => {
-      const steps = {Pending: ['ContainerCreating', 900], ContainerCreating: ['Running', 1500]};
-      const s = steps[p.st]; if (!s) return;
-      setTimeout(() => {
-        if (p.st === 'Terminating') return;
-        p.st = s[0]; if (p.st === 'Running') { p.ready = '1/1'; p.age = '4s'; }
-        refresh(p); progress(p);
-      }, skip ? 80 : s[1]);
-    };
-    const addPod = () => { const p = {n: baseName + gen(), app: 'inventory', ready: '0/1', st: 'Pending', age: '0s', rows: []}; pods.push(p); progress(p); return p; };
-    const killPod = p => { p.st = 'Terminating'; refresh(p); setTimeout(() => { pods = pods.filter(x => x !== p); }, 900); };
-
-    // ----- commands
-    const table = (head, rows) => { line(`<span class="t-hd">${head}</span>`); rows.forEach(r => line(r)); };
-    const help = () => {
-      ['Commands you can try', '  whoami   git log --oneline', '  kubectl get pods -n about   (click a row to open it)', '  kubectl get nodes | pods -n stocklane | deployments | hpa', '  kubectl scale deploy/inventory --replicas=5',
-        '  kubectl delete pod &lt;pod-name&gt;', '  argocd app list', '  ls   open projects   clear   help'].forEach((t, i) => line(i ? `<span class="t-info">${esc(t)}</span>` : esc(t)));
-    };
-    const pages = ['about', 'experience', 'projects', 'cloudlab', 'skills', 'certifications', 'blog', 'contact'];
-    const runCore = async raw => {
-      const cmd = raw.trim().replace(/\s+/g, ' ');
-      if (!cmd) return;
-      const a = cmd.split(' ');
-      if (cmd === 'clear') { body.innerHTML = ''; return; }
-      if (cmd === 'help') return help();
-      if (cmd === 'whoami') {
-        const d = line(''); d.classList.add('term-whoami');
-        d.innerHTML = '<div class="term-photo"></div><div class="term-who"><span class="t-ok term-name">Bawantha Rathnayake</span><br>Cloud &amp; DevOps Engineer · AWS Certified<br>BSc (Hons) Computer Engineering<br>University of Ruhuna · Colombo, Sri Lanka<br><span class="t-ok">Open to Cloud / DevOps roles</span></div>';
-        if (photoNode) d.querySelector('.term-photo').appendChild(photoNode);
-        scroll(); return;
-      }
-      if (cmd === 'git log --oneline' || cmd === 'git log') { gitLog.forEach(r => line(`<span class="t-warn">${r[0]}</span> ${r[1]}`)); return; }
-      if (cmd === 'ls') { line('about  experience  projects  cloudlab  skills  certifications  articles  contact'); return; }
-      if (a[0] === 'open') { const t = (a[1] || '').replace('articles', 'blog').replace('lab', 'cloudlab').replace('cloudcloudlab', 'cloudlab'); if (pages.includes(t)) { line(`<span class="t-dim">opening ${esc(a[1])}…</span>`); setTimeout(() => { location.hash = '#' + t; }, 350); } else line(`<span class="t-err">open: no such page: ${esc(a[1] || '')}</span>`); return; }
-      if (a[0] === 'argocd' && a[1] === 'app' && a[2] === 'list') {
-        table(pad('NAME', 34) + pad('NAMESPACE', 12) + pad('STATUS', 9) + 'HEALTH', [['stocklane-platform-dev', 'kube-system'], ['stocklane-monitoring-operator-dev', 'monitoring'], ['stocklane-monitoring-dev', 'monitoring'], ['stocklane-workshop-dev', 'stocklane'], ['stocklane-dev', 'argocd']]
-          .map(r => `${pad(r[0], 34)}${pad(r[1], 12)}<span class="t-ok">${pad('Synced', 9)}Healthy</span>`)); return;
-      }
-      if (a[0] !== 'kubectl') { line(`<span class="t-err">zsh: command not found: ${esc(a[0])}</span> <span class="t-dim">(type help)</span>`); return; }
-      const verb = a[1], what = a[2] || '';
-      if (verb === 'get') {
-        if (/^nodes?$/.test(what)) { table(pad('NAME', 20) + pad('STATUS', 8) + pad('ROLES', 8) + pad('AGE', 5) + 'VERSION', [['ip-10-42-10-21', 'Ready'], ['ip-10-42-11-47', 'Ready']].map(r => `${pad(r[0], 20)}<span class="t-ok">${pad(r[1], 8)}</span>${pad('<none>', 8).replace('<','&lt;').replace('>','&gt;')}${pad('2d', 5)}v1.31`)); return; }
-        const ns = (cmd.match(/(?:-n|--namespace)[ =](\S+)/) || [])[1] || 'stocklane';
-        if (/^pods?$/.test(what) && ns === 'about') {
-          line(`<span class="t-hd">${pad('NAME', 42)}${pad('READY', 7)}STATUS</span>`);
-          aboutRows.forEach(r => line(`<a class="term-link" href="${r[3]}">${pad(r[0], 42)}${pad(r[1], 7)}<span class="${status(r[2])}">${r[2]}</span></a>`));
-          return;
-        }
-        if (/^pods?$/.test(what) && ns !== 'stocklane') { line(`No resources found in ${esc(ns)} namespace.`); return; }
-        if (/^pods?$/.test(what)) {
-          line(`<span class="t-hd">${pad('NAME', 30)}${pad('READY', 8)}${pad('STATUS', 19)}AGE</span>`);
-          pods.forEach(p => { const r = line(rowHtml(p)); p.rows.push(r); });
-          return;
-        }
-        if (/^(deploy|deployments?)$/.test(what)) {
-          const n = invCount(), up = live().filter(p => p.app === 'inventory' && p.st === 'Running').length;
-          table(pad('NAME', 12) + pad('READY', 8) + pad('UP-TO-DATE', 12) + pad('AVAILABLE', 11) + 'AGE', [[`inventory`, `${up}/${n}`, n, up], ['workshop', '1/1', 1, 1], ['vision', '1/1', 1, 1], ['forecast', '1/1', 1, 1]].map(r => `${pad(r[0], 12)}${pad(r[1], 8)}${pad(r[2], 12)}${pad(r[3], 11)}2d`)); return;
-        }
-        if (what === 'hpa') { const n = invCount(); table(pad('NAME', 12) + pad('REFERENCE', 24) + pad('TARGETS', 11) + pad('MIN', 5) + pad('MAX', 5) + 'REPLICAS', [`${pad('inventory', 12)}${pad('Deployment/inventory', 24)}${pad(n > 1 ? '34%/70%' : '66%/70%', 11)}${pad('1', 5)}${pad('5', 5)}${n}`]); return; }
-        line(`<span class="t-err">error: the server doesn't have a resource type "${esc(what)}"</span>`); return;
-      }
-      if (verb === 'scale') {
-        const m = cmd.match(/--replicas[= ](\d+)/); const target = m ? +m[1] : NaN;
-        if (!/inventory/.test(cmd)) { line('<span class="t-err">error: try: kubectl scale deploy/inventory --replicas=5</span>'); return; }
-        if (!(target >= 1 && target <= 8)) { line('<span class="t-err">error: choose between 1 and 8 replicas</span>'); return; }
-        line('deployment.apps/inventory scaled');
-        let n = invCount();
-        while (n < target) { addPod(); n++; }
-        while (n > target) { const victim = [...pods].reverse().find(p => p.app === 'inventory' && p.st !== 'Terminating'); killPod(victim); n--; }
-        return;
-      }
-      if (verb === 'delete' && /^pods?$/.test(what)) {
-        const p = pods.find(x => x.n === a[3] && x.st !== 'Terminating');
-        if (!p) { line(`<span class="t-err">Error from server (NotFound): pods "${esc(a[3] || '')}" not found</span>`); return; }
-        line(`pod "${esc(p.n)}" deleted`); killPod(p); if (p.app === 'inventory') setTimeout(addPod, 500); return;
-      }
-      line(`<span class="t-err">error: unknown command "${esc(a.slice(1).join(' '))}" for "kubectl"</span> <span class="t-dim">(type help)</span>`);
-    };
-
-    const run = async raw => { await runCore(raw); const c = raw.trim(); if (c && c !== 'clear') line('&nbsp;'); };
-
-    // ----- prompt + typing
-    let inputEl = null;
-    const newPrompt = () => {
-      const d = line(P('') ); const span = d.querySelector('.t-cmd');
-      inputEl = document.createElement('input'); inputEl.className = 'term-input'; inputEl.type = 'text';
-      inputEl.setAttribute('aria-label', 'Terminal command'); inputEl.autocomplete = 'off'; inputEl.spellcheck = false; inputEl.autocapitalize = 'off';
-      span.appendChild(inputEl);
-      inputEl.addEventListener('keydown', async e => {
-        if (e.key === 'Enter') {
-          e.preventDefault(); const v = inputEl.value; inputEl.disabled = true; span.textContent = v;
-          if (v.trim()) { history.push(v); hIdx = history.length; }
-          await run(v); newPrompt();
-        } else if (e.key === 'ArrowUp') { e.preventDefault(); if (hIdx > 0) inputEl.value = history[--hIdx]; }
-        else if (e.key === 'ArrowDown') { e.preventDefault(); inputEl.value = hIdx < history.length - 1 ? history[++hIdx] : (hIdx = history.length, ''); }
-        else if (e.key === 'Tab') { e.preventDefault(); const opts = ['whoami', 'git log --oneline', 'kubectl get pods -n about', 'kubectl get pods', 'kubectl get nodes', 'kubectl get deployments', 'kubectl get hpa', 'kubectl scale deploy/inventory --replicas=5', 'argocd app list', 'whoami', 'help', 'clear', 'open projects']; const m = opts.find(o => o.startsWith(inputEl.value) && o !== inputEl.value); if (m) inputEl.value = m; }
-        else if (e.ctrlKey && e.key.toLowerCase() === 'l') { e.preventDefault(); body.innerHTML = ''; newPrompt(); }
-      });
-      inputEl.addEventListener('focus', () => { skip = true; engaged = true; });
-      if (engaged && !busy) inputEl.focus({preventScroll: true});
-      scroll();
-    };
+    const line = html => { const d = document.createElement('div'); d.className = 'term-line'; d.innerHTML = html; body.appendChild(d); body.scrollTop = body.scrollHeight; return d; };
     const typeCmd = async text => {
       const d = line(P('')); const span = d.querySelector('.t-cmd');
-      if (skip || reduce.matches) { span.textContent = text; } else {
-        const caret = document.createElement('span'); caret.className = 'term-caret'; d.appendChild(caret);
-        for (const ch of text) { if (skip) { span.textContent = text; break; } span.textContent += ch; await sleepRaw(18 + Math.random() * 22); }
-        caret.remove();
-      }
-      span.textContent = text;
+      if (reduce.matches) { span.textContent = text; return d; }
+      const caret = document.createElement('span'); caret.className = 'term-caret'; d.appendChild(caret);
+      for (const ch of text) { span.textContent += ch; await sleepRaw(16 + Math.random() * 18); }
+      await sleepRaw(180); caret.remove(); return d;
+    };
+    const pods = [['certified-kubernetes-administrator', '0/1', 'ContainerCreating', '#certifications'], ['claude-certified-architect-foundations', '1/1', 'Running', '#certifications'],
+      ['aws-solutions-architect-associate', '1/1', 'Completed', '#certifications'], ['stocklane-eks-gitops-mlops-llmops', '1/1', 'Completed', '#projects'],
+      ['issue-tracker-eks-gitops', '1/1', 'Completed', '#projects'], ['issue-tracker-jenkins-cicd', '1/1', 'Completed', '#projects']];
+    const log = [['a3f9c21', '<span class="t-info">(HEAD -&gt; main, tag: open-to-work)</span> Built Stocklane on AWS EKS'], ['7d21b8e', 'Completed the DevOps internship at Mitra AI'],
+      ['c40e5a9', 'Passed AWS Certified Solutions Architect Associate'], ['91b6f3d', 'Built the Issue Tracker platform on EKS with Argo CD'], ['5be02c1', 'Joined Mitra AI as a DevOps intern'], ['e2c7a04', 'Joined PickMe as an SDET intern']];
+    const who = [['Degree:', 'BSc Eng (Hons), Computer Engineering'], ['University:', 'Faculty of Engineering, University of Ruhuna'], ['Focus:', 'AWS · Kubernetes · CI/CD · IaC'], ['Location:', 'Colombo, Sri Lanka'], ['Status:', 'open to Cloud / DevOps roles']];
+    const PHRASE = 'open to Cloud & DevOps roles immediately';
+    let loopTimer = 0;
+    const loop = d => {
+      const span = d.querySelector('.t-cmd');
+      if (reduce.matches) { span.textContent = PHRASE; return; }
+      const caret = document.createElement('span'); caret.className = 'term-caret'; d.appendChild(caret);
+      let i = 0, dir = 1;
+      const step = () => {
+        if (document.hidden || !hero.isConnected) { loopTimer = setTimeout(step, 600); return; }
+        i += dir; span.textContent = PHRASE.slice(0, i);
+        let wait = dir > 0 ? 55 + Math.random() * 35 : 22;
+        if (dir > 0 && i === PHRASE.length) { dir = -1; wait = 2200; } else if (dir < 0 && i === 0) { dir = 1; wait = 650; }
+        loopTimer = setTimeout(step, wait);
+      };
+      step();
     };
     const demo = async () => {
-      busy = true; skip = false; resetPods(); body.innerHTML = '';
-      const steps = ['whoami', 'git log --oneline', 'kubectl get pods -n about'];
-      for (const c of steps) { await sleep(420); await typeCmd(c); await run(c); }
-      await sleep(250); busy = false; newPrompt();
+      await sleepRaw(350);
+      await typeCmd('whoami');
+      const w = line(''); w.classList.add('term-whoami');
+      w.innerHTML = '<div class="term-photo"></div><div class="term-who">' + who.map(r => `<span class="who-k">${r[0]}</span><span class="who-v${r[0] === 'Status:' ? ' t-ok' : ''}">${r[1]}</span>`).join('') + '</div>';
+      if (photoNode) w.querySelector('.term-photo').appendChild(photoNode);
+      line('&nbsp;'); await sleepRaw(reduce.matches ? 0 : 350);
+      await typeCmd('kubectl get pods -n about');
+      line(`<span class="t-hd">${pad('NAME', 42)}${pad('READY', 7)}STATUS</span>`);
+      for (const r of pods) { line(`<a class="term-link" href="${r[3]}">${pad(r[0], 42)}${pad(r[1], 7)}<span class="${status(r[2])}">${r[2]}</span></a>`); if (!reduce.matches) await sleepRaw(70); }
+      line('&nbsp;'); await sleepRaw(reduce.matches ? 0 : 300);
+      await typeCmd('git log --oneline');
+      for (const r of log) { line(`<span class="t-warn">${r[0]}</span> ${r[1]}`); if (!reduce.matches) await sleepRaw(70); }
+      line('&nbsp;'); await sleepRaw(reduce.matches ? 0 : 350);
+      loop(line(P('')));
     };
-    // visitor input stops the demo and leaves the prompt ready
-    body.addEventListener('pointerdown', () => { skip = true; engaged = true; });
-    body.addEventListener('click', () => { const sel = window.getSelection(); if (inputEl && !inputEl.disabled && (!sel || sel.isCollapsed)) inputEl.focus({preventScroll: true}); });
-    hero.querySelector('.term-replay').addEventListener('click', () => { skip = true; setTimeout(demo, 60); });
-    [['Who am I', 'whoami'], ['Career', 'git log --oneline'], ['Certs and projects', 'kubectl get pods -n about'], ['Cluster', 'kubectl get pods -n stocklane'], ['Scale to 5', 'kubectl scale deploy/inventory --replicas=5'], ['Argo CD', 'argocd app list'], ['Help', 'help']].forEach(([label, c]) => {
-      const b = document.createElement('button'); b.type = 'button'; b.textContent = label; b.title = c; chips.appendChild(b);
-      b.addEventListener('click', async () => { if (busy) return; skip = true; engaged = true; if (inputEl) { inputEl.disabled = true; inputEl.closest('.term-line').remove(); } await typeCmd(c); await run(c); newPrompt(); });
-    });
-    const start = () => demo();
-    if ('IntersectionObserver' in window) { const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) { io.disconnect(); start(); } }); io.observe(hero); } else start();
+    if ('IntersectionObserver' in window) { const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) { io.disconnect(); demo(); } }); io.observe(hero); } else demo();
   }
 
   /* ------------------------------------------------------------ static terminals on Projects / Cloud Lab / Skills */
@@ -315,13 +207,13 @@
       ...rowsT(pad('NAME', 36) + pad('NAMESPACE', 12) + pad('STATUS', 9) + 'HEALTH', [['stocklane-dev', 'argocd'], ['stocklane-monitoring-dev', 'monitoring'], ['stocklane-monitoring-operator-dev', 'monitoring'], ['stocklane-platform-dev', 'kube-system'], ['stocklane-workshop-dev', 'stocklane']]
         .map(r => `${pad(r[0], 36)}${pad(r[1], 12)}<span class="t-ok">${pad('Synced', 9)}Healthy</span>`)),
       '',
-      P('kubectl describe hpa'),
+      P('kubectl describe hpa -n issue-app'),
       `${pad('Min replicas:', 16)}1`, `${pad('Max replicas:', 16)}5`, 'Events:',
       `  <span class="t-ok">SuccessfulRescale</span>  New size: 5; reason: cpu resource utilization above target`
     ],
     skills: [
       '<span class="t-dim"># Click any skill below to see where I used it.</span>',
-      P('kubectl get configmap skills -o yaml'),
+      P('kubectl get configmap skills -n about -o yaml'),
       'data:',
       ...[['cloud', 'AWS, Terraform, CloudFormation, VPC, EKS, ECR, ALB, CloudFront'], ['containers', 'Docker, Kubernetes, VMware Tanzu, Helm, Kustomize'], ['delivery', 'Jenkins, GitHub Actions, Argo CD, AWS CodeBuild, Trivy'],
         ['mlops-llmops', 'SageMaker, Bedrock, Textract, Chronos-Bolt, MobileNetV2'], ['observability', 'Prometheus, Grafana, CloudWatch, Alertmanager'], ['security', 'IAM, Cognito MFA, KMS, Secrets Manager, Pod Identity'], ['languages', 'Java, Python, Bash, JavaScript, TypeScript']]

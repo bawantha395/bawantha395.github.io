@@ -52,44 +52,47 @@
     if ('IntersectionObserver' in window && !reduce.matches) { const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) { io.disconnect(); start(); } }); io.observe(el); } else start();
   };
 
+  const plain = html => html;
   const T = {
     experience: el => mount(el, 'bawantha@macbook — kubectl', () => [
-      P('kubectl rollout history deployment/career'),
-      '<span class="t-hd">' + pad('REVISION', 10) + 'CHANGE-CAUSE</span>',
-      row(`${pad('1', 10)}PickMe, SDET intern (July 2024 to March 2025), mobile test automation`, 'data-scroll=".experience-previous"'),
-      row(`${pad('2', 10)}Mitra AI, DevOps intern (April 2026 to October 2026), Sampath Bank staging deployments`, 'data-scroll=".experience-current"'),
+      '<span class="t-dim"># Mitra AI, Sampath Bank staging. Service names are examples, real client names are not shown.</span>',
+      P('kubectl get pods -n staging'),
+      '<span class="t-hd">' + pad('NAME', 34) + pad('READY', 8) + pad('STATUS', 20) + 'RESTARTS</span>',
+      `${pad('app-service-7c9d6b-x2k4p', 34)}${pad('0/1', 8)}<span class="t-err">${pad('CrashLoopBackOff', 20)}</span>5`,
+      `${pad('web-frontend-5b8f4d-q9w2z', 34)}${pad('1/1', 8)}<span class="t-ok">${pad('Running', 20)}</span>0`,
       '',
-      P('kubectl describe deployment mitra-ai'),
-      'Containers',
-      ...[['vmware-tanzu-kubernetes', 'staging deployments, pod and service health checks'], ['linux', 'Python applications and background processes'], ['finacle', 'core banking deployments and checks after release'],
-        ['weblogic-and-tomcat', 'artifact deployments and server configuration'], ['wso2-api-manager', 'API definitions, policies and endpoints'], ['iis', 'web applications and application pools']]
-        .map(r => row(`  <span class="t-info">${pad(r[0], 26)}</span>${r[1]}`, 'data-scroll=".experience-current"'))
+      P('kubectl logs app-service-7c9d6b-x2k4p -n staging'),
+      '<span class="t-err">ERROR could not decrypt the database credential</span>',
+      '',
+      P('kubectl describe configmap app-service-config -n staging'),
+      '<span class="t-dim">  (fixed the value in the YAML manifest, ConfigMap and Secret)</span>',
+      '',
+      P('kubectl rollout restart deployment app-service -n staging'),
+      'deployment.apps/app-service restarted',
+      '',
+      P('kubectl get pods -n staging'),
+      '<span class="t-hd">' + pad('NAME', 34) + pad('READY', 8) + pad('STATUS', 20) + 'RESTARTS</span>',
+      `${pad('app-service-6d5f8c-m3t7r', 34)}${pad('1/1', 8)}<span class="t-ok">${pad('Running', 20)}</span>0`,
+      `${pad('web-frontend-5b8f4d-q9w2z', 34)}${pad('1/1', 8)}<span class="t-ok">${pad('Running', 20)}</span>0`
     ]),
     certifications: el => mount(el, 'bawantha@macbook — kubectl', () => {
       const items = [];
       $$('.certification-featured, .certification-card, article[class*="certification"]').forEach(c => {
-        const h = $('h3', c), a = $('a[href^="http"]', c), y = ($('.certification-provider', c) || {}).textContent || '';
-        if (h) items.push({name: h.textContent.trim(), href: a ? a.href : '', year: (y.match(/\d{4}/) || [''])[0]});
+        const h = $('h3', c), y = ($('.certification-provider', c) || {}).textContent || '';
+        if (h) items.push({name: h.textContent.trim(), year: (y.match(/\d{4}/) || [''])[0]});
       });
       const seen = new Set(), rows = items.filter(i => !seen.has(i.name) && seen.add(i.name));
       return [
         P('kubectl get certificates -n learning'),
         '<span class="t-hd">' + pad('NAME', 52) + pad('READY', 8) + pad('STATUS', 10) + 'YEAR</span>',
-        ...rows.map(r => row(`${pad(slug(r.name), 52)}<span class="t-ok">${pad('True', 8)}${pad('Issued', 10)}</span>${r.year}`, r.href ? `data-href="${esc(r.href)}"` : '')),
-        ...[['certified-kubernetes-administrator', 'Preparing'], ['claude-certified-architect-foundations', 'Issuing']].map(r => `${pad(r[0], 52)}<span class="t-warn">${pad('False', 8)}${r[1]}</span>`),
-        '<span class="t-dim"># Click a row to open the credential.</span>'
+        ...rows.map(r => `${pad(slug(r.name), 52)}<span class="t-ok">${pad('True', 8)}${pad('Issued', 10)}</span>${r.year}`),
+        ...[['certified-kubernetes-administrator', 'Preparing'], ['claude-certified-architect-foundations', 'Issuing']].map(r => `${pad(r[0], 52)}<span class="t-warn">${pad('False', 8)}${r[1]}</span>`)
       ];
     }),
     articles: el => {
-      const groups = $$('.article-group').map(g => ({title: ($('h2', g) || {}).textContent || 'Articles', rows: $$('.article-row', g).map(a => ({name: ($('.article-name', a) || {}).textContent, date: ($('.article-date', a) || {}).textContent, href: a.href}))}));
-      const all = groups.flatMap(g => g.rows.map(r => ({...r, topic: g.title})));
-      mount(el, 'bawantha@macbook — kubectl', i => {
-        const g = i === 0 ? null : groups[i - 1], list = g ? g.rows : all;
-        return [P(g ? `kubectl get jobs -l topic=${slug(g.title)}` : 'kubectl get jobs -n medium'),
-          '<span class="t-hd">' + pad('STATUS', 11) + 'NAME</span>',
-          ...list.map((r, k) => row(`<span class="t-ok">${pad('Completed', 11)}</span>${esc(r.name)} <span class="t-dim">${esc(r.date)}</span>`, `data-href="${esc(r.href)}"`)),
-          `<span class="t-dim"># ${list.length} articles. Click a row to read it on Medium.</span>`];
-      }, ['All', ...groups.map(g => g.title)]);
+      const all = $$('.article-row').map(a => ({name: ($('.article-name', a) || {}).textContent, date: ($('.article-date', a) || {}).textContent}));
+      mount(el, 'bawantha@macbook — kubectl', () => [P('kubectl get jobs -n medium'), '<span class="t-hd">' + pad('STATUS', 11) + 'NAME</span>',
+        ...all.map(r => `<span class="t-ok">${pad('Completed', 11)}</span>${esc(r.name)} <span class="t-dim">${esc(r.date)}</span>`)]);
     },
     contact: el => mount(el, 'bawantha@macbook — kubectl', () => [
       P('kubectl get svc bawantha'),
@@ -103,81 +106,6 @@
     ])
   };
   $$('.page-term[data-term]').forEach(el => { const f = T[el.dataset.term]; if (f) f(el); });
-
-  /* ------------------------------------------------------------ Cloud Lab: Grafana style panels, pipeline strip, Argo CD tree */
-  const labEl = $('#lab-dash');
-  if (labEl) {
-    const gauge = '<svg viewBox="0 0 80 80" class="g-ring" aria-hidden="true"><circle cx="40" cy="40" r="32" class="g-bg"/><circle cx="40" cy="40" r="32" class="g-fg" pathLength="100"/></svg>';
-    const stepGraph = '<svg viewBox="0 0 160 56" class="g-step" aria-hidden="true"><polyline points="0,50 40,50 40,38 70,38 70,26 100,26 100,14 130,14 130,6 160,6" /></svg>';
-    const stages = ['Commit', 'Test', 'Plan', 'Apply', 'Release', 'Platform', 'Frontend', 'Healthy'];
-    const stageNote = ['push to GitHub', 'tests and Trivy', 'saved to S3', 'exact saved plan', 'images to ECR', 'Argo CD installed', 'web app published', 'all apps synced'];
-    labEl.innerHTML =
-      '<div class="gf-row" aria-label="Key numbers">' +
-        '<div class="gf-panel"><h4>Deploy run</h4><strong class="gf-big">11 min 22 sec</strong><div class="gf-seg" aria-hidden="true">' + '<i></i>'.repeat(6) + '</div><small>Stocklane, test to frontend</small></div>' +
-        '<div class="gf-panel"><h4>Argo CD applications</h4><div class="gf-gauge">' + gauge + '<strong>5 of 5</strong></div><small>Synced and Healthy</small></div>' +
-        '<div class="gf-panel"><h4>Automated tests</h4><strong class="gf-big">159</strong><small>Python tests, plus Java tests</small></div>' +
-        '<div class="gf-panel"><h4>Autoscaling</h4>' + stepGraph + '<strong class="gf-mid">1 to 5 replicas</strong><small>EKS issue tracker, simulated load</small></div>' +
-        '<div class="gf-panel"><h4>Release gates</h4><ul class="gf-list"><li>Forecast error 60% or less</li><li>Photo precision 0.98 or more</li><li>Label fields approved by a person</li></ul></div>' +
-        '<div class="gf-panel"><h4>CI run</h4><strong class="gf-big">3 min 41 sec</strong><small>EKS issue tracker, build and push</small></div>' +
-      '</div>' +
-      '<div class="pipe-card" aria-label="How a change ships"><div class="pipe-title"><strong>How a change ships</strong><span>Recorded Stocklane deploy run</span></div><ol class="pipe">' +
-        stages.map((s, i) => `<li><i>✓</i><b>${s}</b><small>${stageNote[i]}</small></li>`).join('') + '</ol></div>' +
-      '<div class="argo-wrap"><div class="argo-head"><strong>Argo CD resource trees</strong><span>Both platforms as Argo CD shows them. The panel below walks through each node by itself.</span></div>' +
-        '<div class="argo-body"><div class="argo-trees"></div><aside class="argo-detail" aria-live="off"><h4></h4><p class="ad-kind"></p><p class="ad-text"></p><div class="ad-badges"></div><div class="ad-dots"></div></aside></div></div>';
-
-    const TREES = [
-      {title: 'Stocklane on EKS', root: {n: 'stocklane-dev', k: 'Application, argocd', t: 'The parent application. It watches the main branch and creates the child applications in order.', kids: [
-        {n: 'stocklane-platform-dev', k: 'Application, wave 0', t: 'Installs the controllers and the secret store first, because everything else depends on them.', kids: [{n: 'controllers', k: 'Deployment'}, {n: 'secret-store', k: 'ClusterSecretStore'}]},
-        {n: 'stocklane-monitoring-operator-dev', k: 'Application, wave 10', t: 'Installs the Prometheus Operator so monitoring objects can exist.', kids: [{n: 'prometheus-operator', k: 'Deployment'}]},
-        {n: 'stocklane-monitoring-dev', k: 'Application, wave 20', t: 'Prometheus, Grafana and Alertmanager watch the cluster.', kids: [{n: 'prometheus', k: 'StatefulSet'}, {n: 'grafana', k: 'Deployment'}, {n: 'alertmanager', k: 'StatefulSet'}]},
-        {n: 'stocklane-workshop-dev', k: 'Application, wave 30', t: 'The four services and the model index job. This is the last wave, so everything it needs is already running.', kids: [{n: 'inventory', k: 'Deployment'}, {n: 'workshop', k: 'Deployment'}, {n: 'vision', k: 'Deployment'}, {n: 'forecast', k: 'Deployment'}, {n: 'model-index', k: 'Job, hook'}]}]}},
-      {title: 'Issue tracker on EKS', root: {n: 'issue-tracker', k: 'Argo CD applications', t: 'Argo CD watches the Git branch and applies the Kustomize overlays. Helm installs the monitoring stack.', kids: [
-        {n: 'application-dev', k: 'Application, dev', t: 'Four services synced from the dev overlay with prune and self-heal turned on.', kids: [{n: 'frontend-service', k: 'Deployment'}, {n: 'api-gateway', k: 'Deployment'}, {n: 'auth-service', k: 'Deployment'}, {n: 'issue-service', k: 'Deployment'}]},
-        {n: 'monitoring-stack', k: 'Application, Helm chart', t: 'The kube-prometheus-stack chart with Prometheus, Grafana and Alertmanager.', kids: [{n: 'prometheus', k: 'StatefulSet'}, {n: 'grafana', k: 'Deployment'}]},
-        {n: 'monitoring-addons', k: 'Application', t: 'Service monitors for three services and an alert when one is down for two minutes.', kids: [{n: 'service-monitors', k: 'ServiceMonitor'}, {n: 'service-down-alert', k: 'PrometheusRule'}]}]}}
-    ];
-    const nodes = [];
-    const card = (d, depth) => {
-      const el = document.createElement('div'); el.className = 'ac'; el.tabIndex = 0; el.setAttribute('role', 'button');
-      el.innerHTML = `<span class="ac-i">${depth === 0 ? '<img alt="" src="assets/tool-icons/argocd.svg">' : esc(d.k[0])}</span><span class="ac-t"><b>${esc(d.n)}</b><small>${esc(d.k)}</small></span><span class="ac-s"><em class="b-prog">Syncing</em><em class="b-ok">Healthy</em></span>`;
-      nodes.push({el, d, depth}); return el;
-    };
-    const list = (d, depth) => {
-      const li = document.createElement('li'); li.appendChild(card(d, depth));
-      if (d.kids && d.kids.length) { const ul = document.createElement('ul'); d.kids.forEach(k => ul.appendChild(list(k, depth + 1))); li.appendChild(ul); }
-      return li;
-    };
-    const holder = $('.argo-trees', labEl);
-    TREES.forEach(t => { const w = document.createElement('div'); w.className = 'argo-tree-one'; w.innerHTML = `<h4>${esc(t.title)}</h4>`; const ul = document.createElement('ul'); ul.className = 'at'; ul.appendChild(list(t.root, 0)); w.appendChild(ul); holder.appendChild(w); });
-
-    // detail panel + gentle auto walk
-    const det = $('.argo-detail', labEl), ads = $('.ad-dots', det);
-    const walk = nodes.filter(x => x.d.t); let cur = -1, timer = 0, paused = false;
-    walk.forEach((_, i) => { const d = document.createElement('i'); ads.appendChild(d); });
-    const show = i => {
-      cur = (i + walk.length) % walk.length; const n = walk[cur];
-      nodes.forEach(x => x.el.classList.toggle('ac-on', x === n));
-      $('h4', det).textContent = n.d.n; $('.ad-kind', det).textContent = n.d.k; $('.ad-text', det).textContent = n.d.t;
-      $('.ad-badges', det).innerHTML = '<span class="b-ok2">Synced</span><span class="b-ok2">Healthy</span>';
-      $$('i', ads).forEach((d, k) => d.classList.toggle('on', k === cur));
-    };
-    const play = () => { clearInterval(timer); if (reduce.matches) return; timer = setInterval(() => { if (!paused && !document.hidden) show(cur + 1); }, 4200); };
-    nodes.forEach(x => { x.el.addEventListener('click', () => { const i = walk.indexOf(x); if (i > -1) { show(i); play(); } }); x.el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); x.el.click(); } }); });
-    labEl.addEventListener('pointerenter', () => { paused = true; }); labEl.addEventListener('pointerleave', () => { paused = false; });
-    labEl.addEventListener('focusin', () => { paused = true; }); labEl.addEventListener('focusout', () => { paused = false; });
-    show(0);
-
-    // reveal: panels, pipeline, then every tree node in sync order
-    const reveal = async () => {
-      labEl.classList.add('lab-ready');
-      if (reduce.matches) { labEl.classList.add('lab-done'); nodes.forEach(x => x.el.classList.add('ac-show', 'ac-ok')); $$('.pipe li', labEl).forEach(li => li.classList.add('p-ok')); return; }
-      for (const li of $$('.pipe li', labEl)) { li.classList.add('p-ok'); await sleep(230); }
-      labEl.classList.add('lab-done');
-      for (const x of nodes) { x.el.classList.add('ac-show'); await sleep(90); setTimeout(() => x.el.classList.add('ac-ok'), 650); }
-      play();
-    };
-    if ('IntersectionObserver' in window) { const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); reveal(); } }, {threshold: .1}); io.observe(labEl); } else reveal();
-  }
 
   /* ------------------------------------------------------------ skills: click a skill, see where it was used */
   const NAMES = {stocklane: 'stocklane', eks: 'issue-tracker-eks', issue: 'issue-tracker-ec2', tcms: 'institute-system', book: 'book-stall', attendance: 'fingerprint-iot', mitra: 'mitra-ai-internship', pickme: 'pickme-internship'};
@@ -262,29 +190,17 @@
     });
   });
 
-  /* ------------------------------------------------------------ Dock */
-  const DOCK = [
-    ['Terminal', '#about', 'term', 'term'], ['Projects', '#projects', 'icon-grid', 'int'], ['Cloud Lab', '#cloudlab', 'icon-monitor', 'int'],
-    ['GitHub', 'https://github.com/bawantha395', 'assets/tool-icons/github.svg', 'ext'], ['LinkedIn', 'https://linkedin.com/in/rathnayake-rmbtm', 'assets/tool-icons/linkedin.svg', 'ext'], ['Medium', 'https://medium.com/@rathnayakermbtm', 'assets/tool-icons/medium.svg', 'ext']
-  ];
-  const dock = document.createElement('nav'); dock.className = 'dock'; dock.setAttribute('aria-label', 'Quick links');
-  dock.innerHTML = '<ul>' + DOCK.map(([label, href, icon, kind]) => {
-    const glyph = kind === 'ext' ? `<img alt="" src="${icon}" width="26" height="26">` : kind === 'term' ? '<span class="dock-term">&gt;_</span>' : `<svg aria-hidden="true" viewBox="0 0 24 24" class="icon"><use href="#${icon}"></use></svg>`;
-    return `<li><a href="${href}" ${kind === 'ext' ? 'target="_blank" rel="noopener noreferrer"' : ''} data-dock="${kind}" aria-label="${label}">${glyph}<span class="dock-label">${label}</span></a></li>`;
-  }).join('') + '</ul>';
-  document.body.appendChild(dock);
-  dock.addEventListener('click', e => {
-    const a = e.target.closest('a[data-dock="term"]'); if (!a) return;
-    e.preventDefault();
-    const focusTerm = () => { const t = $('#hero-term'); if (t) { t.scrollIntoView({behavior: reduce.matches ? 'auto' : 'smooth', block: 'center'}); const i = $('.term-input', t); if (i && !i.disabled) setTimeout(() => i.focus({preventScroll: true}), 350); } };
-    if (location.hash !== '#about' && location.hash !== '') { go('#about'); setTimeout(focusTerm, 450); } else focusTerm();
-  });
-  // magnification on pointer devices
-  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduce.matches) {
-    const items = $$('li', dock);
-    dock.addEventListener('pointermove', e => items.forEach(li => { const r = li.getBoundingClientRect(), d = Math.abs(e.clientX - (r.left + r.width / 2)); li.style.setProperty('--s', (1 + Math.max(0, 1 - d / 110) * .5).toFixed(3)); }));
-    dock.addEventListener('pointerleave', () => items.forEach(li => li.style.setProperty('--s', 1)));
+  /* ------------------------------------------------------------ Dock effect on the sidebar */
+  const nav = $('#navigation');
+  if (nav && window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduce.matches) {
+    const links = $$('a', nav);
+    const set = (a, v) => { a.style.setProperty('--ds', v.toFixed(3)); };
+    nav.addEventListener('pointermove', e => links.forEach(a => { const r = a.getBoundingClientRect(), d = Math.abs(e.clientY - (r.top + r.height / 2)); set(a, 1 + Math.max(0, 1 - d / 120) * .09); }));
+    nav.addEventListener('pointerleave', () => links.forEach(a => set(a, 1)));
   }
+  // quiet the background while the page scrolls, so nothing moves behind the text
+  let scrollTimer = 0;
+  window.addEventListener('scroll', () => { document.documentElement.classList.add('is-scrolling'); clearTimeout(scrollTimer); scrollTimer = setTimeout(() => document.documentElement.classList.remove('is-scrolling'), 160); }, {passive: true});
 
   /* ------------------------------------------------------------ context chip (namespace) and build badge */
   const pageName = $('#page-name');
