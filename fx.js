@@ -127,7 +127,7 @@
   /* ------------------------------------------------------------ hero terminal: types itself, then loops one line */
   const hero = document.getElementById('hero-term');
   if (hero) {
-    hero.innerHTML = bar('bawantha@macbook — zsh') + '<div class="term-body" role="log" aria-label="Terminal output"></div>';
+    hero.innerHTML = bar('bawantha@cloud-devops — zsh') + '<div class="term-body" role="log" aria-label="Terminal output"></div>';
     const body = hero.querySelector('.term-body');
     const photoNode = document.querySelector('.hero-photo-content');
     const line = html => { const d = document.createElement('div'); d.className = 'term-line'; d.innerHTML = html; body.appendChild(d); body.scrollTop = body.scrollHeight; return d; };
@@ -206,16 +206,16 @@
       P('kubectl describe deployment stocklane'),
       `${pad('Name:', 14)}stocklane`,
       `${pad('Pipeline:', 14)}test → plan → apply → release → platform → frontend (11 min 22 sec run)`,
-      `${pad('Environments:', 14)}dev, staging and prod from one pipeline`,
+      `${pad('Environment:', 14)}dev, deployed from one pipeline`,
       `${pad('GitOps:', 14)}Argo CD keeps EKS in sync with Git`,
       `${pad('MLOps:', 14)}pretrained Chronos-Bolt forecast, weekly SageMaker job for the photo matcher`,
       `${pad('LLMOps:', 14)}Textract and Bedrock suggest label details, a person approves`
     ],
     cloudlab: [
       '<span class="t-dim"># Five Stocklane Argo CD apps are Synced and Healthy. The issue tracker scaled from 1 to 5 replicas.</span>',
-      P('argocd app list'),
-      ...rowsT(pad('NAME', 36) + pad('NAMESPACE', 12) + pad('STATUS', 9) + 'HEALTH', [['stocklane-dev', 'argocd'], ['stocklane-monitoring-dev', 'monitoring'], ['stocklane-monitoring-operator-dev', 'monitoring'], ['stocklane-platform-dev', 'kube-system'], ['stocklane-workshop-dev', 'stocklane']]
-        .map(r => `${pad(r[0], 36)}${pad(r[1], 12)}<span class="t-ok">${pad('Synced', 9)}Healthy</span>`)),
+      P('kubectl get applications -n argocd'),
+      ...rowsT(pad('NAME', 36) + pad('SYNC STATUS', 13) + 'HEALTH STATUS', ['stocklane-dev', 'stocklane-monitoring-dev', 'stocklane-monitoring-operator-dev', 'stocklane-platform-dev', 'stocklane-workshop-dev']
+        .map(n => `${pad(n, 36)}<span class="t-ok">${pad('Synced', 13)}Healthy</span>`)),
       '',
       P('kubectl describe hpa -n issue-app'),
       `${pad('Min replicas:', 16)}1`, `${pad('Max replicas:', 16)}5`, 'Events:',
@@ -247,10 +247,10 @@
   };
   document.querySelectorAll('.page-term[data-term]').forEach(el => {
     const lines = DATA[el.dataset.term]; if (!lines) return;
-    el.innerHTML = bar('bawantha@macbook — kubectl') + '<div class="term-body" role="region" aria-label="Terminal output"></div>';
+    el.innerHTML = bar('bawantha@cloud-devops — kubectl') + '<div class="term-body" role="region" aria-label="Terminal output"></div>';
     const b = el.querySelector('.term-body');
     const paint = async () => {
-      const ds = lines.map(l => { const d = document.createElement('div'); d.className = 'term-line'; d.innerHTML = l || '&nbsp;'; d.style.visibility = 'hidden'; b.appendChild(d); return d; });
+      const ds = lines.concat(['', P('') + '<span class="term-caret"></span>']).map(l => { const d = document.createElement('div'); d.className = 'term-line'; d.innerHTML = l || '&nbsp;'; d.style.visibility = 'hidden'; b.appendChild(d); return d; });
       b.style.minHeight = b.offsetHeight + 'px';
       for (const d of ds) { d.style.visibility = ''; if (!reduce.matches) await sleepRaw(70); }
     };

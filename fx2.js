@@ -51,7 +51,7 @@
     let first = true, token = 0;
     const paint = async arg => {
       const my = ++token; body.innerHTML = '';
-      const lines = build(arg);
+      const lines = build(arg).concat(['', P('') + '<span class="term-caret"></span>']);
       const ds = lines.map(l => { const d = document.createElement('div'); d.className = 'term-line'; d.innerHTML = l || '&nbsp;'; if (first && !reduce.matches) d.style.visibility = 'hidden'; body.appendChild(d); return d; });
       if (first && !reduce.matches) {
         body.style.minHeight = body.offsetHeight + 'px';
@@ -69,7 +69,7 @@
 
   const plain = html => html;
   const T = {
-    experience: el => mount(el, 'bawantha@macbook — kubectl', () => [
+    experience: el => mount(el, 'bawantha@cloud-devops — kubectl', () => [
       '<span class="t-dim"># Mitra AI, Sampath Bank staging. Service names are examples, real client names are not shown.</span>',
       P('kubectl get pods -n staging'),
       '<span class="t-hd">' + pad('NAME', 34) + pad('READY', 8) + pad('STATUS', 20) + 'RESTARTS</span>',
@@ -90,7 +90,7 @@
       `${pad('app-service-6d5f8c-m3t7r', 34)}${pad('1/1', 8)}<span class="t-ok">${pad('Running', 20)}</span>0`,
       `${pad('web-frontend-5b8f4d-q9w2z', 34)}${pad('1/1', 8)}<span class="t-ok">${pad('Running', 20)}</span>0`
     ]),
-    certifications: el => mount(el, 'bawantha@macbook — kubectl', () => {
+    certifications: el => mount(el, 'bawantha@cloud-devops — kubectl', () => {
       const items = [];
       $$('.certification-featured, .certification-card, article[class*="certification"]').forEach(c => {
         const h = $('h3', c), y = ($('.certification-provider', c) || {}).textContent || '';
@@ -106,11 +106,11 @@
     }),
     articles: el => {
       const all = $$('.article-row').map(a => ({name: ($('.article-name', a) || {}).textContent, date: ($('.article-date', a) || {}).textContent}));
-      mount(el, 'bawantha@macbook — kubectl', () => [P('kubectl get jobs -n medium'), '<span class="t-hd">' + pad('STATUS', 11) + 'NAME</span>',
+      mount(el, 'bawantha@cloud-devops — kubectl', () => [P('kubectl get jobs -n medium'), '<span class="t-hd">' + pad('STATUS', 11) + 'NAME</span>',
         ...all.map(r => `<span class="t-ok">${pad('Completed', 11)}</span>${esc(r.name)} <span class="t-dim">${esc(r.date)}</span>`)]);
     },
-    contact: el => mount(el, 'bawantha@macbook — kubectl', () => [
-      P('kubectl get svc bawantha'),
+    contact: el => mount(el, 'bawantha@cloud-devops — kubectl', () => [
+      P('kubectl get svc -n contact'),
       '<span class="t-hd">' + pad('NAME', 10) + pad('TYPE', 14) + 'EXTERNAL-IP</span>',
       row(`${pad('email', 10)}${pad('LoadBalancer', 14)}<span class="t-ok">rathnayakermbtm@gmail.com</span> <span class="t-dim copied-tip">click to copy</span>`, 'data-copy="rathnayakermbtm@gmail.com"'),
       row(`${pad('phone', 10)}${pad('LoadBalancer', 14)}+94 71 090 1846`, 'data-href="tel:+94710901846"'),
@@ -121,6 +121,15 @@
     ])
   };
   $$('.page-term[data-term]').forEach(el => { const f = T[el.dataset.term]; if (f) f(el); });
+
+  /* ------------------------------------------------------------ workflow opens only when asked */
+  const wf = $('#delivery-pipeline');
+  if (wf) {
+    const open = () => { wf.classList.remove('wf-collapsed'); setTimeout(() => { const y = wf.getBoundingClientRect().top + window.scrollY - 72; window.scrollTo({top: y, behavior: reduce.matches ? 'auto' : 'smooth'}); }, 60); };
+    document.addEventListener('click', e => { const a = e.target.closest('a[href="#delivery-pipeline"]'); if (a) { e.preventDefault(); open(); history.replaceState(null, '', '#delivery-pipeline'); } });
+    window.addEventListener('hashchange', () => { if (location.hash === '#delivery-pipeline') open(); });
+    if (location.hash === '#delivery-pipeline') wf.classList.remove('wf-collapsed');
+  }
 
   /* ------------------------------------------------------------ skills: click a skill, see where it was used */
   const NAMES = {stocklane: 'stocklane', eks: 'issue-tracker-eks', issue: 'issue-tracker-ec2', tcms: 'institute-system', book: 'book-stall', attendance: 'fingerprint-iot', mitra: 'mitra-ai-internship', pickme: 'pickme-internship'};
