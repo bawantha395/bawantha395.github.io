@@ -580,3 +580,32 @@ small,.workflow-labels small,.hero-result-card>span,.work-tags,.lab-capture-coun
 .selected-compact .work-card strong{font-size:.82rem}
 #delivery-pipeline{padding-top:12px!important;padding-bottom:10px!important}
 #delivery-pipeline .workflow-lane,#delivery-pipeline [class*=lane]{margin-top:0!important}
+
+/* round 8: mobile and tablet */
+@media(max-width:1100px){
+  .hero{grid-template-columns:1fr!important;gap:18px!important}
+  .hero-portrait{order:-1;width:100%}
+  .hero-term{min-height:0!important}
+  .hero-term .term-body{font-size:clamp(9.4px,2.55vw,12px)!important;overflow-x:auto!important;overflow-y:hidden!important}
+  .hero-portrait .proof-strip{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .hero-portrait .about-socials{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .selected-compact .work-cards{grid-template-columns:1fr!important}
+  .selected-compact .work-card strong{white-space:normal}
+  .page-term .term-body{font-size:clamp(9.4px,2.5vw,12.5px)!important;overflow-x:auto!important}
+}
+@media(max-width:560px){
+  .hero-term .term-photo,.hero-term .term-photo .hero-photo-content,.hero-term .term-photo .portrait-frame{width:92px!important}
+  .hero-term .term-photo .portrait-badge{width:44px!important;height:44px!important;right:-14px!important}
+  .hero-term .term-who{padding-left:10px!important}
+  .hero-term .term-whoami{display:flex;flex-wrap:wrap;gap:6px 10px}
+  .hero-term .term-who .who-v{white-space:normal}
+}
+@media(max-width:560px){
+  .hero-term .term-line:not(:has(.term-link)):not(:has(.t-hd)):not(.term-whoami){white-space:pre-wrap!important;overflow-wrap:anywhere}
+  .hero-term .term-link,.hero-term .t-hd{font-size:.84em}
+  .hero-term .term-body{padding-left:12px!important;padding-right:10px!important}
+  .page-term .term-line{white-space:pre-wrap!important;overflow-wrap:anywhere}
+  .page-term .term-link,.page-term .t-hd{font-size:.88em}
+}
+[data-theme=dark] .menu-toggle{background:rgba(255,255,255,.1)!important;color:#eaf1fb!important;border-color:rgba(255,255,255,.28)!important}
+[data-theme=dark] .menu-toggle svg,[data-theme=dark] .menu-toggle span{color:#eaf1fb!important;stroke:currentColor}
