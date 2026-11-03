@@ -143,37 +143,37 @@
       ['issue-tracker-eks-gitops', '1/1', 'Completed', '#projects'], ['issue-tracker-jenkins-cicd', '1/1', 'Completed', '#projects']];
     const log = [['a3f9c21', '<span class="t-info">(HEAD -&gt; main, tag: open-to-work)</span> Built Stocklane on AWS EKS'], ['7d21b8e', 'Completed the DevOps internship at Mitra AI'],
       ['c40e5a9', 'Passed AWS Certified Solutions Architect Associate'], ['91b6f3d', 'Built the Issue Tracker platform on EKS with Argo CD'], ['5be02c1', 'Joined Mitra AI as a DevOps intern'], ['e2c7a04', 'Joined PickMe as an SDET intern']];
-    const who = [['Degree:', 'BSc Eng (Hons), Computer Engineering'], ['University:', 'Faculty of Engineering, University of Ruhuna'], ['Focus:', 'AWS · Kubernetes · CI/CD · IaC'], ['Location:', 'Colombo, Sri Lanka'], ['Status:', 'open to Cloud / DevOps roles']];
-    const PHRASE = 'open to Cloud & DevOps roles immediately';
+    const who = [['Degree:', 'BSc Eng (Hons), Computer Engineering'], ['Uni:', 'Faculty of Engineering, University of Ruhuna'], ['Focus:', 'AWS · Kubernetes · CI/CD · IaC'], ['Location:', 'Colombo, Sri Lanka'], ['Status:', 'open to Cloud / DevOps roles']];
+    const PHRASE = 'open to Cloud and DevOps Engineer roles immediately';
     let loopTimer = 0;
     const loop = d => {
       const span = d.querySelector('.t-cmd');
       if (reduce.matches) { span.textContent = PHRASE; return; }
       const caret = document.createElement('span'); caret.className = 'term-caret'; d.appendChild(caret);
-      let i = 0, dir = 1;
+      let i = 0;
       const step = () => {
         if (document.hidden || !hero.isConnected) { loopTimer = setTimeout(step, 600); return; }
-        i += dir; span.textContent = PHRASE.slice(0, i);
-        let wait = dir > 0 ? 55 + Math.random() * 35 : 22;
-        if (dir > 0 && i === PHRASE.length) { dir = -1; wait = 2200; } else if (dir < 0 && i === 0) { dir = 1; wait = 650; }
-        loopTimer = setTimeout(step, wait);
+        if (i < PHRASE.length) { i++; span.textContent = PHRASE.slice(0, i); loopTimer = setTimeout(step, 48 + Math.random() * 30); }
+        else { loopTimer = setTimeout(() => { i = 0; span.textContent = ''; loopTimer = setTimeout(step, 450); }, 2600); }
+        body.scrollTop = body.scrollHeight;
       };
       step();
     };
+    const gap = () => { const d = document.createElement('div'); d.className = 'term-gap'; body.appendChild(d); };
     const demo = async () => {
       await sleepRaw(350);
       await typeCmd('whoami');
       const w = line(''); w.classList.add('term-whoami');
       w.innerHTML = '<div class="term-photo"></div><div class="term-who">' + who.map(r => `<span class="who-k">${r[0]}</span><span class="who-v${r[0] === 'Status:' ? ' t-ok' : ''}">${r[1]}</span>`).join('') + '</div>';
       if (photoNode) w.querySelector('.term-photo').appendChild(photoNode);
-      line('&nbsp;'); await sleepRaw(reduce.matches ? 0 : 350);
+      gap(); await sleepRaw(reduce.matches ? 0 : 300);
       await typeCmd('kubectl get pods -n about');
       line(`<span class="t-hd">${pad('NAME', 42)}${pad('READY', 7)}STATUS</span>`);
       for (const r of pods) { line(`<a class="term-link" href="${r[3]}">${pad(r[0], 42)}${pad(r[1], 7)}<span class="${status(r[2])}">${r[2]}</span></a>`); if (!reduce.matches) await sleepRaw(70); }
       line('&nbsp;'); await sleepRaw(reduce.matches ? 0 : 300);
       await typeCmd('git log --oneline');
       for (const r of log) { line(`<span class="t-warn">${r[0]}</span> ${r[1]}`); if (!reduce.matches) await sleepRaw(70); }
-      line('&nbsp;'); await sleepRaw(reduce.matches ? 0 : 350);
+      gap(); await sleepRaw(reduce.matches ? 0 : 300);
       loop(line(P('')));
     };
     if ('IntersectionObserver' in window) { const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) { io.disconnect(); demo(); } }); io.observe(hero); } else demo();
@@ -220,13 +220,29 @@
         .map(r => `  <span class="t-info">${pad(r[0] + ':', 15)}</span><span class="t-ok">"${r[1]}"</span>`)
     ]
   };
+
+  /* type a line's text character by character, keeping its markup */
+  const typeLine = async (d, html, fast) => {
+    d.innerHTML = html || '&nbsp;';
+    const w = document.createTreeWalker(d, NodeFilter.SHOW_TEXT), nodes = [];
+    while (w.nextNode()) nodes.push([w.currentNode, w.currentNode.nodeValue]);
+    nodes.forEach(n => { n[0].nodeValue = ''; });
+    const isCmd = !!d.querySelector('.t-cmd'), step = isCmd ? 1 : 4, ms = isCmd ? 22 : 7;
+    for (const [n, full] of nodes) { for (let i = step; i < full.length + step; i += step) { n.nodeValue = full.slice(0, i); await sleepRaw(ms); } n.nodeValue = full; }
+  };
+  /* reserve the final height first so typing never pushes the page */
+  const reserve = (body, lines) => {
+    body.innerHTML = lines.map(l => `<div class="term-line">${l || '&nbsp;'}</div>`).join('');
+    body.style.minHeight = body.scrollHeight + 'px'; body.innerHTML = '';
+  };
   document.querySelectorAll('.page-term[data-term]').forEach(el => {
     const lines = DATA[el.dataset.term]; if (!lines) return;
     el.innerHTML = bar('bawantha@macbook — kubectl') + '<div class="term-body" role="region" aria-label="Terminal output"></div>';
     const b = el.querySelector('.term-body');
     const paint = async () => {
-      for (const l of lines) { const d = document.createElement('div'); d.className = 'term-line'; d.innerHTML = l || '&nbsp;'; b.appendChild(d); if (!reduce.matches) await sleepRaw(38); }
+      for (const l of lines) { const d = document.createElement('div'); d.className = 'term-line'; b.appendChild(d); if (!reduce.matches) await typeLine(d, l); else d.innerHTML = l || '&nbsp;'; }
     };
+    if (!reduce.matches) reserve(b, lines);
     if ('IntersectionObserver' in window && !reduce.matches) { const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) { io.disconnect(); paint(); } }); io.observe(el); }
     else lines.forEach(l => { const d = document.createElement('div'); d.className = 'term-line'; d.innerHTML = l || '&nbsp;'; b.appendChild(d); });
   });

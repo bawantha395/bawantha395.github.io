@@ -11,6 +11,21 @@
   const P = cmd => `<span class="t-p">bawantha@macbook</span> <span class="t-path">~/portfolio</span> % <span class="t-cmd">${esc(cmd)}</span>`;
   const bar = t => `<div class="term-bar"><i class="r"></i><i class="y"></i><i class="g"></i><span class="term-title">${esc(t)}</span></div>`;
   const slug = t => t.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+  /* type a line's text character by character, keeping its markup */
+  const typeLine = async (d, html, fast) => {
+    d.innerHTML = html || '&nbsp;';
+    const w = document.createTreeWalker(d, NodeFilter.SHOW_TEXT), nodes = [];
+    while (w.nextNode()) nodes.push([w.currentNode, w.currentNode.nodeValue]);
+    nodes.forEach(n => { n[0].nodeValue = ''; });
+    const isCmd = !!d.querySelector('.t-cmd'), step = isCmd ? 1 : 4, ms = isCmd ? 22 : 7;
+    for (const [n, full] of nodes) { for (let i = step; i < full.length + step; i += step) { n.nodeValue = full.slice(0, i); await sleep(ms); } n.nodeValue = full; }
+  };
+  /* reserve the final height first so typing never pushes the page */
+  const reserve = (body, lines) => {
+    body.innerHTML = lines.map(l => `<div class="term-line">${l || '&nbsp;'}</div>`).join('');
+    body.style.minHeight = body.scrollHeight + 'px'; body.innerHTML = '';
+  };
   const go = hash => { location.hash = hash; };
 
   /* ------------------------------------------------------------ clickable rows */
@@ -37,10 +52,11 @@
     const paint = async arg => {
       const my = ++token; body.innerHTML = '';
       const lines = build(arg);
+      if (first) reserve(body, lines);
       for (const l of lines) {
         if (my !== token) return;
-        const d = document.createElement('div'); d.className = 'term-line'; d.innerHTML = l || '&nbsp;'; body.appendChild(d);
-        if (first && !reduce.matches) await sleep(34);
+        const d = document.createElement('div'); d.className = 'term-line'; body.appendChild(d);
+        if (first && !reduce.matches) await typeLine(d, l); else d.innerHTML = l || '&nbsp;';
       }
       first = false;
     };

@@ -430,3 +430,103 @@ small,.workflow-labels small,.hero-result-card>span,.work-tags,.lab-capture-coun
 .is-scrolling .argo-cursor,.is-scrolling #fx-wake{opacity:0;transition:opacity .12s}
 .argo-cursor,#fx-wake{transition:opacity .35s}
 @media(prefers-reduced-motion:reduce){#navigation a{transition:none;transform:none}}
+
+/* ================= round 4 ================= */
+:root{--line:rgba(16,38,74,.2)}
+[data-theme=dark]{--line:rgba(255,255,255,.16)}
+
+/* My Direction line and the Education divider must be visible on the glass cards */
+.direction-step:not(:last-child) .direction-rail:before{background:rgba(16,38,74,.32)!important}
+.direction-marker{border-color:#5f7899!important;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.92)}
+.direction-current .direction-marker{background:var(--navy)!important;border-color:var(--navy)!important}
+.direction-next .direction-marker{border-color:var(--navy)!important}
+.direction-moving-dot{background:#1fbf75!important;box-shadow:0 0 0 4px rgba(31,191,117,.22)!important}
+.education-coursework,.education .education-coursework{border-top:1px solid rgba(16,38,74,.24)!important}
+.education .education-meta{border-left:1px solid rgba(16,38,74,.24)!important}
+[data-theme=dark] .direction-step:not(:last-child) .direction-rail:before{background:rgba(255,255,255,.3)!important}
+[data-theme=dark] .direction-marker{background:#0d182c!important;border-color:#8ea6c9!important;box-shadow:0 0 0 4px rgba(13,24,44,.9)}
+[data-theme=dark] .direction-current .direction-marker{background:#7ee0a0!important;border-color:#7ee0a0!important}
+[data-theme=dark] .education-coursework,[data-theme=dark] .education .education-coursework{border-top-color:rgba(255,255,255,.2)!important}
+[data-theme=dark] .education .education-meta{border-left-color:rgba(255,255,255,.2)!important}
+
+/* terminal: black and grey */
+.hero-term,.page-term,.skill-pop{background:rgba(14,15,19,.8)!important;border-color:rgba(255,255,255,.16)!important;box-shadow:0 22px 56px rgba(0,0,0,.5)}
+.term-bar{background:rgba(255,255,255,.08)}.term-title{color:#b9bdca}
+.hero-term .term-body{font-size:11px;line-height:1.45;padding:10px 14px 8px;height:376px}
+.term-gap{height:7px}
+.who-v{white-space:nowrap}
+.term-who{gap:1px 12px;line-height:1.45}
+.term-whoami{margin:3px 0 0;gap:14px}
+.term-line{min-height:1.45em}
+.term-line,.term-who{white-space:nowrap}
+.hero-term .term-body{white-space:nowrap;overflow-x:hidden}
+
+/* photo: lighter scan lines, badge visible on the corner */
+.term-photo{width:92px}
+.term-photo .hero-photo-content{width:92px!important}
+.term-photo .portrait-frame{position:relative;width:92px!important;aspect-ratio:1/1.12;max-width:none;overflow:visible!important;border-radius:9px!important;padding:0!important;background:#0b1626!important;border:1px solid rgba(120,200,215,.55)!important;box-shadow:0 0 14px rgba(80,170,200,.2)!important}
+.term-photo .portrait-frame>img:first-child{border-radius:8px!important;width:100%;height:100%;object-fit:cover;object-position:center 16%;filter:none}
+.term-photo .portrait-frame::after{content:"";position:absolute;inset:0;border-radius:8px;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(4,10,20,.24) 0 1px,transparent 1px 3px)}
+.term-photo .portrait-badge{display:block!important;position:absolute;right:-12px;bottom:-12px;width:36px!important;height:36px!important;aspect-ratio:auto!important;padding:3px!important;border-radius:9px!important;background:#fff;border:1px solid #d6dfea;box-shadow:0 6px 16px rgba(0,0,0,.4);z-index:2;animation:none!important}
+.term-photo .portrait-badge img{width:100%!important;height:100%!important;object-fit:contain;border-radius:0!important;background:transparent!important}
+
+/* right column: cards, profile links, Selected Work */
+.hero-portrait{gap:8px!important}
+.hero-portrait .about-socials{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px!important;width:100%;margin:0}
+.hero-portrait .about-socials a{flex-direction:row;min-height:36px!important;padding:4px 8px!important;gap:6px;font-size:.76rem!important}
+.hero-portrait .about-socials a img{width:18px;height:18px}
+.selected-compact{margin:2px 0 0}
+.selected-compact .section-heading{margin:0 0 5px}
+.selected-compact .about-heading .eyebrow{display:none!important}
+.selected-compact h2{font-size:.88rem!important;margin:0}
+.selected-compact .work-cards{grid-template-columns:1fr!important;gap:6px}
+.selected-compact .work-card{flex-direction:row;align-items:center;gap:10px;padding:7px 12px;border-radius:12px;background:rgba(255,255,255,.9)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.selected-compact .work-card strong{font-size:.84rem;white-space:nowrap;flex:none;min-width:128px}
+.selected-compact .work-kind,.selected-compact .work-tags{display:none}
+.selected-compact .work-card>span:not(.work-kind):not(.work-tags){font-size:.72rem;line-height:1.3;color:#44546e}
+
+/* workflow: the whole figure fits on one screen */
+#delivery-pipeline{scroll-margin-top:80px;padding:12px 18px 10px!important;margin:0 0 18px!important}
+#delivery-pipeline .workflow-heading{margin-bottom:6px}
+#delivery-pipeline .workflow-heading h2{font-size:1.02rem!important;margin:0 0 3px!important}
+#delivery-pipeline .workflow-heading p{font-size:.74rem!important;line-height:1.4!important;margin:0!important}
+#delivery-pipeline .workflow-lane{margin:8px 0 4px!important;gap:10px}
+#delivery-pipeline .workflow-lane-label{font-size:.8rem}#delivery-pipeline .workflow-lane-note{font-size:.7rem}
+#delivery-pipeline .workflow-track{gap:8px;margin:0!important}
+#delivery-pipeline .workflow-track:before{top:19px!important}
+#delivery-pipeline .workflow-icon{width:38px!important;height:38px!important;border-radius:11px!important;box-shadow:0 0 0 4px rgba(255,255,255,.5)!important}
+#delivery-pipeline .workflow-icon .tool-logo{width:19px;height:19px}
+#delivery-pipeline .workflow-step{gap:5px!important}
+#delivery-pipeline .workflow-labels{gap:1px!important}
+#delivery-pipeline .workflow-labels strong{font-size:.78rem!important;line-height:1.25!important}
+#delivery-pipeline .workflow-labels small{font-size:.67rem!important;line-height:1.28!important}
+#delivery-pipeline .workflow-view-hint{display:none}
+#delivery-pipeline .workflow-caption{padding-top:8px!important;margin-top:8px!important;font-size:.72rem!important}
+
+/* dark mode fixes */
+[data-theme=dark] .hero-marker{background:none!important;color:#f2f7ff!important}
+[data-theme=dark] .hero-marker::before{background:rgba(126,224,160,.26)!important}
+[data-theme=dark] .hero-marker,[data-theme=dark] .hero-marker *{color:#f2f7ff!important}
+[data-theme=dark] .skill-tags li,[data-theme=dark] .tags li,[data-theme=dark] .result-chips li,[data-theme=dark] .result-chip,[data-theme=dark] .interest-tags li,[data-theme=dark] .lab-components li,
+[data-theme=dark] .lab-card-icon,[data-theme=dark] .profile-lab-icon,[data-theme=dark] .project-icon-panel,[data-theme=dark] .credential-symbol,[data-theme=dark] .education-achievement,[data-theme=dark] .education-gpa,
+[data-theme=dark] .experience-points li,[data-theme=dark] .experience-meta .date,[data-theme=dark] .experience-status-badge,[data-theme=dark] .workflow-icon,[data-theme=dark] .workflow-brands,[data-theme=dark] .article-row,
+[data-theme=dark] .evidence-tile,[data-theme=dark] .icon-button,[data-theme=dark] .lab-capture-frame,[data-theme=dark] .lab-capture-link,[data-theme=dark] .project-thumbnail,[data-theme=dark] .pipeline-steps li>span,
+[data-theme=dark] .selected-compact .work-card,[data-theme=dark] .hero-result-card,[data-theme=dark] .slideshow-controls button,[data-theme=dark] .slideshow-state,[data-theme=dark] .project-slideshow,[data-theme=dark] .slideshow-stage{background:rgba(255,255,255,.075)!important;border-color:rgba(255,255,255,.16)!important;color:#dbe6f7!important}
+[data-theme=dark] .skill-tags li *,[data-theme=dark] .tags li *,[data-theme=dark] .result-chips li *,[data-theme=dark] .interest-tags li *,[data-theme=dark] .lab-components li *,[data-theme=dark] .experience-points li *,[data-theme=dark] .article-row *,[data-theme=dark] .evidence-tile *,
+[data-theme=dark] .education-achievement *,[data-theme=dark] .education-gpa *,[data-theme=dark] .selected-compact .work-card *,[data-theme=dark] .workflow-labels *{color:#dbe6f7!important}
+[data-theme=dark] .skill-tags li,[data-theme=dark] .tags li,[data-theme=dark] .interest-tags li,[data-theme=dark] .result-chips li{color:#e6efff!important}
+[data-theme=dark] .workflow-labels strong,[data-theme=dark] .experience-points li strong,[data-theme=dark] .article-name{color:#f4f8ff!important}
+[data-theme=dark] img.tool-logo[src$="github.svg"],[data-theme=dark] img.tool-logo[src$="medium.svg"],[data-theme=dark] img.tool-logo[src$="aws.svg"]{filter:invert(1) hue-rotate(180deg) brightness(1.1)}
+[data-theme=dark] .page-topbar{background:rgba(13,24,44,.94)!important}
+[data-theme=dark] .selected-compact .work-card>span:not(.work-kind):not(.work-tags){color:#b9c8e2}
+[data-theme=dark] .section-heading h1,[data-theme=dark] .category-heading h2{color:#f2f7ff!important}
+@media(max-width:1100px){.hero-portrait .about-socials{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* keep table columns aligned */
+.hero-term .term-body,.hero-term .term-line{white-space:pre}
+.hero-term .term-who{white-space:nowrap}
+.hero-term .term-line.term-whoami{white-space:normal}
+.hero-term .term-body{height:436px!important;overflow-y:hidden}
+.hero-term{min-height:480px}
+.hero-term .term-who,.hero-term .term-photo{margin-bottom:8px}
+.hero-term .term-who{min-height:100px}
