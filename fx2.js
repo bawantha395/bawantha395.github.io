@@ -52,11 +52,10 @@
     const paint = async arg => {
       const my = ++token; body.innerHTML = '';
       const lines = build(arg);
-      if (first) reserve(body, lines);
       for (const l of lines) {
         if (my !== token) return;
         const d = document.createElement('div'); d.className = 'term-line'; body.appendChild(d);
-        if (first && !reduce.matches) await typeLine(d, l); else d.innerHTML = l || '&nbsp;';
+        d.innerHTML = l || '&nbsp;';
       }
       first = false;
     };

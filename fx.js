@@ -144,7 +144,7 @@
     const log = [['a3f9c21', '<span class="t-info">(HEAD -&gt; main, tag: open-to-work)</span> Built Stocklane on AWS EKS'], ['7d21b8e', 'Completed the DevOps internship at Mitra AI'],
       ['c40e5a9', 'Passed AWS Certified Solutions Architect Associate'], ['91b6f3d', 'Built the Issue Tracker platform on EKS with Argo CD'], ['5be02c1', 'Joined Mitra AI as a DevOps intern'], ['e2c7a04', 'Joined PickMe as an SDET intern']];
     const who = [['Degree:', 'BSc Eng (Hons), Computer Engineering'], ['Uni:', 'Faculty of Engineering, University of Ruhuna'], ['Focus:', 'AWS · Kubernetes · CI/CD · IaC'], ['Location:', 'Colombo, Sri Lanka'], ['Status:', 'open to Cloud / DevOps roles']];
-    const PHRASE = 'open to Cloud and DevOps Engineer roles immediately';
+    const PHRASE = 'open to Cloud and DevOps Engineer roles';
     let loopTimer = 0;
     const loop = d => {
       const span = d.querySelector('.t-cmd');
@@ -160,23 +160,23 @@
       step();
     };
     const gap = () => { const d = document.createElement('div'); d.className = 'term-gap'; body.appendChild(d); };
-    const demo = async () => {
-      await sleepRaw(350);
-      await typeCmd('whoami');
+    const cmd = text => { const d = line(P('')); d.querySelector('.t-cmd').textContent = text; return d; };
+    const demo = () => {
+      cmd('whoami');
       const w = line(''); w.classList.add('term-whoami');
       w.innerHTML = '<div class="term-photo"></div><div class="term-who">' + who.map(r => `<span class="who-k">${r[0]}</span><span class="who-v${r[0] === 'Status:' ? ' t-ok' : ''}">${r[1]}</span>`).join('') + '</div>';
       if (photoNode) w.querySelector('.term-photo').appendChild(photoNode);
-      gap(); await sleepRaw(reduce.matches ? 0 : 300);
-      await typeCmd('kubectl get pods -n about');
+      gap();
+      cmd('kubectl get pods -n about');
       line(`<span class="t-hd">${pad('NAME', 42)}${pad('READY', 7)}STATUS</span>`);
-      for (const r of pods) { line(`<a class="term-link" href="${r[3]}">${pad(r[0], 42)}${pad(r[1], 7)}<span class="${status(r[2])}">${r[2]}</span></a>`); if (!reduce.matches) await sleepRaw(70); }
-      line('&nbsp;'); await sleepRaw(reduce.matches ? 0 : 300);
-      await typeCmd('git log --oneline');
-      for (const r of log) { line(`<span class="t-warn">${r[0]}</span> ${r[1]}`); if (!reduce.matches) await sleepRaw(70); }
-      gap(); await sleepRaw(reduce.matches ? 0 : 300);
+      for (const r of pods) line(`<a class="term-link" href="${r[3]}">${pad(r[0], 42)}${pad(r[1], 7)}<span class="${status(r[2])}">${r[2]}</span></a>`);
+      line('&nbsp;');
+      cmd('git log --oneline');
+      for (const r of log) line(`<span class="t-warn">${r[0]}</span> ${r[1]}`);
+      gap();
       loop(line(P('')));
     };
-    if ('IntersectionObserver' in window) { const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) { io.disconnect(); demo(); } }); io.observe(hero); } else demo();
+    demo();
   }
 
   /* ------------------------------------------------------------ static terminals on Projects / Cloud Lab / Skills */
@@ -202,7 +202,7 @@
       `${pad('LLMOps:', 14)}Textract and Bedrock suggest label details, a person approves`
     ],
     cloudlab: [
-      '<span class="t-dim"># Evidence: five Stocklane Argo CD apps are Synced and Healthy; the issue tracker scaled from 1 to 5 replicas.</span>',
+      '<span class="t-dim"># Five Stocklane Argo CD apps are Synced and Healthy. The issue tracker scaled from 1 to 5 replicas.</span>',
       P('argocd app list'),
       ...rowsT(pad('NAME', 36) + pad('NAMESPACE', 12) + pad('STATUS', 9) + 'HEALTH', [['stocklane-dev', 'argocd'], ['stocklane-monitoring-dev', 'monitoring'], ['stocklane-monitoring-operator-dev', 'monitoring'], ['stocklane-platform-dev', 'kube-system'], ['stocklane-workshop-dev', 'stocklane']]
         .map(r => `${pad(r[0], 36)}${pad(r[1], 12)}<span class="t-ok">${pad('Synced', 9)}Healthy</span>`)),
@@ -240,9 +240,9 @@
     el.innerHTML = bar('bawantha@macbook — kubectl') + '<div class="term-body" role="region" aria-label="Terminal output"></div>';
     const b = el.querySelector('.term-body');
     const paint = async () => {
-      for (const l of lines) { const d = document.createElement('div'); d.className = 'term-line'; b.appendChild(d); if (!reduce.matches) await typeLine(d, l); else d.innerHTML = l || '&nbsp;'; }
+      for (const l of lines) { const d = document.createElement('div'); d.className = 'term-line'; b.appendChild(d); d.innerHTML = l || '&nbsp;'; }
     };
-    if (!reduce.matches) reserve(b, lines);
+
     if ('IntersectionObserver' in window && !reduce.matches) { const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) { io.disconnect(); paint(); } }); io.observe(el); }
     else lines.forEach(l => { const d = document.createElement('div'); d.className = 'term-line'; d.innerHTML = l || '&nbsp;'; b.appendChild(d); });
   });
