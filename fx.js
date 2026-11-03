@@ -119,7 +119,7 @@
   reduce.addEventListener('change', () => { document.body.classList.remove('fx-cursor-on'); kick(); });
 
   /* ------------------------------------------------------------ terminal helpers */
-  const P = (cmd) => `<span class="t-p">bawantha@macbook</span> <span class="t-path">~/portfolio</span> % <span class="t-cmd">${esc(cmd)}</span>`;
+  const P = (cmd) => `<span class="t-p">bawantha@cloud-devops</span> <span class="t-path">~/portfolio</span> % <span class="t-cmd">${esc(cmd)}</span>`;
   const bar = title => `<div class="term-bar"><i class="r"></i><i class="y"></i><i class="g"></i><span class="term-title">${esc(title)}</span></div>`;
   const pad = (s, n) => String(s).padEnd(n, ' ');
   const status = s => ({Running: 't-ok', Completed: 't-ok', Ready: 't-ok', ContainerCreating: 't-warn', Pending: 't-warn', Terminating: 't-dim', Synced: 't-ok', Healthy: 't-ok'}[s] || '');

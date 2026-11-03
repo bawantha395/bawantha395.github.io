@@ -8,7 +8,7 @@
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const P = cmd => `<span class="t-p">bawantha@macbook</span> <span class="t-path">~/portfolio</span> % <span class="t-cmd">${esc(cmd)}</span>`;
+  const P = cmd => `<span class="t-p">bawantha@cloud-devops</span> <span class="t-path">~/portfolio</span> % <span class="t-cmd">${esc(cmd)}</span>`;
   const bar = t => `<div class="term-bar"><i class="r"></i><i class="y"></i><i class="g"></i><span class="term-title">${esc(t)}</span></div>`;
   const slug = t => t.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
@@ -166,7 +166,7 @@
     const list = matches(name), notes = NOTES[name.toLowerCase()] || {};
     const rows = list.length ? list.map(k => `<div class="term-line"><span class="t-info">${pad(NAMES[k], 24)}</span><span class="t-ok">${pad(k === 'mitra' || k === 'pickme' ? 'Completed' : 'Completed', 11)}</span>${esc(notes[k] || 'used in this project')}</div>`).join('')
       : '<div class="term-line t-dim">No project tags yet. See Experience and Projects for the full picture.</div>';
-    pop.innerHTML = bar('bawantha@macbook — kubectl') + '<button class="skill-pop-x" type="button" aria-label="Close">×</button><div class="term-body">' +
+    pop.innerHTML = bar('bawantha@cloud-devops — kubectl') + '<button class="skill-pop-x" type="button" aria-label="Close">×</button><div class="term-body">' +
       `<div class="term-line">${P('kubectl get pods -l uses=' + slug(name))}</div>` + (list.length ? `<div class="term-line t-hd">${pad('NAME', 24)}${pad('STATUS', 11)}WHAT I DID</div>` : '') + rows + '</div>';
     pop.hidden = false;
     $('.skill-pop-x', pop).addEventListener('click', closePop);
