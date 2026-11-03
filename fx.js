@@ -174,7 +174,17 @@
       cmd('git log --oneline');
       for (const r of log) line(`<span class="t-warn">${r[0]}</span> ${r[1]}`);
       gap();
-      loop(line(P('')));
+      const last = line(P(''));
+      const kids = [...body.children];
+      if (reduce.matches) { loop(last); return; }
+      hero.style.minHeight = hero.offsetHeight + 'px';
+      kids.forEach(k => { k.style.visibility = 'hidden'; });
+      const reveal = async () => {
+        await sleepRaw(250);
+        for (const k of kids) { k.style.visibility = ''; if (k !== last) await sleepRaw(k.classList.contains('term-gap') ? 40 : 85); }
+        await sleepRaw(200); loop(last);
+      };
+      if ('IntersectionObserver' in window) { const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) { io.disconnect(); reveal(); } }); io.observe(hero); } else reveal();
     };
     demo();
   }
@@ -240,7 +250,9 @@
     el.innerHTML = bar('bawantha@macbook — kubectl') + '<div class="term-body" role="region" aria-label="Terminal output"></div>';
     const b = el.querySelector('.term-body');
     const paint = async () => {
-      for (const l of lines) { const d = document.createElement('div'); d.className = 'term-line'; b.appendChild(d); d.innerHTML = l || '&nbsp;'; }
+      const ds = lines.map(l => { const d = document.createElement('div'); d.className = 'term-line'; d.innerHTML = l || '&nbsp;'; d.style.visibility = 'hidden'; b.appendChild(d); return d; });
+      b.style.minHeight = b.offsetHeight + 'px';
+      for (const d of ds) { d.style.visibility = ''; if (!reduce.matches) await sleepRaw(70); }
     };
 
     if ('IntersectionObserver' in window && !reduce.matches) { const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) { io.disconnect(); paint(); } }); io.observe(el); }

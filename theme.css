@@ -561,3 +561,22 @@ small,.workflow-labels small,.hero-result-card>span,.work-tags,.lab-capture-coun
 .hero-term .term-who{padding-left:14px}
 .hero-term .term-whoami{margin-bottom:12px}
 .hero-term .term-body{font-size:clamp(8px,.68vw,11px)!important}
+
+/* round 6: glass-polished photo, no scan lines */
+.hero-term .term-photo .portrait-frame::after{background:linear-gradient(135deg,rgba(255,255,255,.28) 0%,rgba(255,255,255,.07) 28%,transparent 46%,transparent 72%,rgba(255,255,255,.1) 100%)!important;mix-blend-mode:normal!important;border-radius:9px!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),inset 0 1px 0 rgba(255,255,255,.4)}
+.hero-term .term-photo .portrait-frame{border:1px solid rgba(255,255,255,.35)!important;box-shadow:0 10px 26px rgba(0,0,0,.35),0 0 0 1px rgba(255,255,255,.06)!important;background:rgba(255,255,255,.08)!important}
+.hero-term .term-photo .portrait-frame>img:first-child{filter:none!important}
+.term-caret{background:#d7dbe6}
+.hero{padding-bottom:6px!important}
+.hero-portrait{gap:7px!important}
+.hero-copy{padding-top:16px!important;padding-bottom:16px!important}
+.hero-copy p{line-height:1.45!important}
+.hero-copy .hero-more-about,.hero-copy .hero-more-about p{font-size:.78rem!important}
+.hero-copy>p,.hero-copy .hero-work p{font-size:.82rem!important}
+.hero-copy .hero-actions{margin-top:8px!important}
+.hero-copy .hero-workflow-action{margin-top:6px!important}
+.hero-copy .hero-chips,.hero-copy .chip-row{margin:8px 0!important}
+.hero-term .term-photo,.hero-term .term-photo .hero-photo-content,.hero-term .term-photo .portrait-frame{width:100px!important}
+.hero-term .term-who{padding-left:10px!important}
+.hero-term .term-body{font-size:clamp(7.8px,.66vw,11px)!important}
+.hero-term .term-photo .portrait-badge{width:48px!important;height:48px!important}

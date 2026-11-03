@@ -52,10 +52,10 @@
     const paint = async arg => {
       const my = ++token; body.innerHTML = '';
       const lines = build(arg);
-      for (const l of lines) {
-        if (my !== token) return;
-        const d = document.createElement('div'); d.className = 'term-line'; body.appendChild(d);
-        d.innerHTML = l || '&nbsp;';
+      const ds = lines.map(l => { const d = document.createElement('div'); d.className = 'term-line'; d.innerHTML = l || '&nbsp;'; if (first && !reduce.matches) d.style.visibility = 'hidden'; body.appendChild(d); return d; });
+      if (first && !reduce.matches) {
+        body.style.minHeight = body.offsetHeight + 'px';
+        for (const d of ds) { if (my !== token) return; d.style.visibility = ''; await sleep(75); }
       }
       first = false;
     };
